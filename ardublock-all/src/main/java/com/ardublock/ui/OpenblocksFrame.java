@@ -236,7 +236,7 @@ public class OpenblocksFrame extends JFrame
 		topPanel.add(portOptions);
 		topPanel.add(boardOptions);
 		topPanel.add(redetectButton);
-		topPanel.add(serialMonitorButton);
+		
 		
 		/*********************************************/
 		/**** Generate Bottom Panel Of The Window ****/
@@ -268,6 +268,7 @@ public class OpenblocksFrame extends JFrame
 		bottomPanel.add(uploadLabel);
 		bottomPanel.add(uploadScrollPane);
 		bottomPanel.add(versionLabel);
+		bottomPanel.add(serialMonitorButton);
 
 		/***** Position Items On Window ******/
 		this.add(topPanel, BorderLayout.NORTH);

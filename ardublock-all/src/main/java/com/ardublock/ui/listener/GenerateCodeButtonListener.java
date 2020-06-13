@@ -72,16 +72,16 @@ public class GenerateCodeButtonListener implements ActionListener
 		uploadThread = new Thread(uploadRunnable);
 		
 		//-create temp_sketch directory in the executing folder of this .jar
-		sketchfileDir = System.getProperty("user.dir") + "\\temp_sketch";
+		sketchfileDir = context.getSketchDir();
+		
 		File directory = new File(sketchfileDir);
 		if(!directory.exists()) {
-			System.out.println("Creating directory");
+			System.out.println("Creating directory: " + sketchfileDir);
 			directory.mkdir();
 		}
 		
 		//- create file path to the .ino that will be created later.
-		sketchfilePath = sketchfileDir + "\\temp_sketch.ino";
-		
+		sketchfilePath = sketchfileDir + context.getSketchName();
 	}
 
 	public boolean generateC() {
@@ -364,6 +364,10 @@ public class GenerateCodeButtonListener implements ActionListener
 			board = "uno";
 			upload_cmd += " --board arduino:avr:" + board;
 		}
+
+		//- add "/dev" to port path if on linux or mac
+
+		port = context.getPortString(port);
 		
 		upload_cmd += " --port " + port;
 		upload_cmd += " --upload " + sketchfilePath;

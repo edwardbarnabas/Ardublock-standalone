@@ -67,7 +67,71 @@ public class Context
 	private String saveFileName;
 	
 	//final public static String VERSION_STRING = " ";
+
+	//- return port string based on os
+	public String getPortString(String detectedPort) {
+		if (osType.equals(OsType.WINDOWS)) {
+			//- no need to append anything
+		}
+		else if (osType.equals(OsType.MAC)) {
+			detectedPort = "/dev/" + detectedPort;
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			detectedPort = "/dev/" + detectedPort;
+		}
+		else {
+			detectedPort = "/dev/" + detectedPort;
+		}
+
+		return detectedPort;
+
+	}
+
+	//- return sketch name based on ino
+	public String getSketchName() {
+
+		String path = null;
+
+		if (osType.equals(OsType.WINDOWS)) {
+			path = "\\temp_sketch.ino";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			path = "/temp_sketch.ino";
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			path = "/temp_sketch.ino";
+		}
+		else {
+			path = "/temp_sketch.ino";
+		}
 	
+		return path;
+
+	}
+
+	public String getSketchDir() {
+
+		String path = System.getProperty("user.dir");
+
+		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\temp_sketch";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			path += "/temp_sketch";
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			path += "/temp_sketch";
+		}
+		else {
+			path += "/temp_sketch";
+		}
+	
+		return path;
+
+	}
+	
+	//- returns the arduino command line for uploading and compiling depending
+	//- on the OS
 	public String getArduinoCmdLine() {
 		
 		String path = null;
