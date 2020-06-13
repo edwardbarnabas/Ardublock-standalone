@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -60,10 +61,21 @@ public class OpenblocksFrame extends JFrame
 	private FileFilter ffilter;
 	private SerialMonitorRunnable myRunnable;
 	private SerialMonitor monitor;
-	private JTextArea textArea;
+	private JTextArea textArea; 
+	
+	
 	private Thread serialMonitorThread;
 	private JFrame frame;
+	
+	
+	public JFrame uploadFrame;
+	public JScrollPane uploadScrollPane;
+	public JTextArea uploadTextArea;
+	
 	private JScrollPane scrollPane;
+	
+	
+	
 	private ResourceBundle uiMessageBundle;
 	
 	public JComboBox<String> portOptions;
@@ -101,15 +113,27 @@ public class OpenblocksFrame extends JFrame
 		fileChooser.setFileFilter(ffilter);
 		fileChooser.addChoosableFileFilter(ffilter);
 		
-		initOpenBlocks();
-		
-		//-setup for Serial Monitor
+		/* Serial Monitor Objects */
 		textArea = new JTextArea();
 		monitor = new SerialMonitor();
 		frame = new JFrame("Serial Monitor");
+		
 		scrollPane = new JScrollPane(textArea);
 		myRunnable = new SerialMonitorRunnable(textArea, monitor, scrollPane);
 	    serialMonitorThread = new Thread(myRunnable);
+	    
+	    /* Serial Upload Objects */
+  		uploadTextArea = new JTextArea();
+  		uploadTextArea.setEditable(false);
+  		uploadTextArea.setLineWrap(true);
+  		uploadTextArea.setWrapStyleWord(true);
+  		uploadTextArea.setMargin(new Insets(5, 5, 5, 5));
+		
+  		uploadScrollPane = new JScrollPane(uploadTextArea);
+  		uploadScrollPane.setPreferredSize(new Dimension(300,50));
+  		uploadFrame = new JFrame("Upload");
+	  
+		initOpenBlocks();
 	  
 	}
 	
@@ -137,7 +161,8 @@ public class OpenblocksFrame extends JFrame
 		openButton.addActionListener(new OpenButtonListener(this));
 		
 		JButton generateButton = new JButton(uiMessageBundle.getString("ardublock.ui.upload"));
-		generateButton.addActionListener(new GenerateCodeButtonListener(this, context, monitor));
+		generateButton.addActionListener(new GenerateCodeButtonListener(this, context));
+		
 		
 		JButton serialMonitorButton = new JButton(uiMessageBundle.getString("ardublock.ui.serialMonitor"));
 		serialMonitorButton.addActionListener(new ActionListener () {
@@ -190,8 +215,6 @@ public class OpenblocksFrame extends JFrame
 			}
 		});
 		
-	
-		
 		/* get port */
 		String[] portList = {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
 		String[] temp = SerialMonitor.getPorts();
@@ -207,11 +230,13 @@ public class OpenblocksFrame extends JFrame
 		topPanel.add(saveButton);
 		topPanel.add(saveAsButton);
 		topPanel.add(openButton);
+		
+		/* upload and hardware detect interface */
 		topPanel.add(generateButton);
-		topPanel.add(serialMonitorButton);
 		topPanel.add(portOptions);
 		topPanel.add(boardOptions);
 		topPanel.add(redetectButton);
+		topPanel.add(serialMonitorButton);
 		
 		/*********************************************/
 		/**** Generate Bottom Panel Of The Window ****/
@@ -233,10 +258,15 @@ public class OpenblocksFrame extends JFrame
 			    }
 			}
 		});
-		JLabel versionLabel = new JLabel("v " + uiMessageBundle.getString("ardublock.ui.version"));
+		JLabel versionLabel = new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version"));
+		JLabel uploadLabel = new JLabel("Upload Status: ");
+
 		
 		bottomPanel.add(saveImageButton);
 		bottomPanel.add(websiteButton);
+		
+		bottomPanel.add(uploadLabel);
+		bottomPanel.add(uploadScrollPane);
 		bottomPanel.add(versionLabel);
 
 		/***** Position Items On Window ******/
@@ -440,8 +470,7 @@ public class OpenblocksFrame extends JFrame
 		strInit += "Selected BaudRate: " + monitor.selectedBaud + "\n\n";
 		
 		strInit += "****************************************************************\n";
-		strInit += "****************************************************************\n";
-		
+
 		textArea.setText(strInit);
 		
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);

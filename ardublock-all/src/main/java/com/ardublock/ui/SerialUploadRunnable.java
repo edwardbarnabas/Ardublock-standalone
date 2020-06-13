@@ -1,30 +1,22 @@
 package com.ardublock.ui;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class SerialUploadRunnable implements Runnable {
 
 	private boolean doStop;
 	public String upload_cmd;
-	private JScrollPane scrollPane;
 	private JTextArea textArea;
-	private JFrame frame;
 	public boolean timed_out = false;
 
-	public SerialUploadRunnable(JFrame jframe, JTextArea jTextArea, JScrollPane jscrollPane) {
+	public SerialUploadRunnable(JTextArea jTextArea) {
 		upload_cmd = null;
 		textArea = jTextArea;
-		scrollPane = jscrollPane;
 		doStop = false;
-		frame = jframe;
 	}
 
 	public synchronized void doStop() {
@@ -125,10 +117,7 @@ public class SerialUploadRunnable implements Runnable {
 			if (line.contains("-Uflash:w:")) {
 				
 				textArea.append("\n");
-				textArea.append("\n**************************************************************");
-				textArea.append("\n************** Uploading Code To Device ****************");
-				textArea.append("\n**************************************************************");
-				
+
 				textArea.append("\nStarting to upload. Please wait...");
 				
 				//- go to last line of the textArea
@@ -154,13 +143,11 @@ public class SerialUploadRunnable implements Runnable {
 				    	System.out.println("Error: Process timed out!");
 				    	
 				    	textArea.append("\n");
-						textArea.append("\n**************************************************************");
-						textArea.append("\n*************************** Result **************************");
-						textArea.append("\n**************************************************************");
 						
 				    	textArea.append("\nUpload Failed! Timeout error.");
 				    	textArea.append("\nIt shouldn't take this long!");
 				    	textArea.append("\nCheck settings and try again!\n\n");
+						textArea.setBackground(Color.red);
 				    	
 				    	//- show the last character added in the scrollbar
 						textArea.setCaretPosition(textArea.getDocument().getLength());	
@@ -210,9 +197,6 @@ public class SerialUploadRunnable implements Runnable {
 		
 		
 		textArea.append("\n");
-		textArea.append("\n**************************************************************");
-		textArea.append("\n*************************** Result **************************");
-		textArea.append("\n**************************************************************");
 		
 		//- go to last line of the textArea
 		textArea.setCaretPosition(textArea.getDocument().getLength());		
@@ -220,21 +204,27 @@ public class SerialUploadRunnable implements Runnable {
 		switch(exitStatus) {
 		  case 0:
 			textArea.append("\nSuccess! Done Uploading!\n\n");
+			textArea.setBackground(Color.green);
 		    break;
 		  case 1:
 			textArea.append("\nUpload Failed! Check connection!\n\n");
+			textArea.setBackground(Color.red);
 		    break;
 		  case 2:
 			textArea.append("\nUpload Failed! Sketch not found!\n\n");
+			textArea.setBackground(Color.red);
 			break;
 		  case 3:
 			textArea.append("\nUpload Failed! Invalid (argument for) commandline option\n\n");
+			textArea.setBackground(Color.red);
 			break;
 		  case 4:
 			textArea.append("\nUpload Failed! Preference passed to --get-pref does not exist\n\n");
+			textArea.setBackground(Color.red);
 			break;
 		  default:
 			textArea.append("\nUpload Failed! Unknown Error.\n\n");
+			textArea.setBackground(Color.red);
 			break;
 		}
 		
@@ -242,19 +232,6 @@ public class SerialUploadRunnable implements Runnable {
 
 		//- go to last line of the textArea
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
-
-		
-		//- automatically close the window if it was successful.  If there is an error,
-		//- leave it open so that the user can see.
-	/*	if (exitStatus == 0) {
-			textArea.append("\nThis window will close automatically in 3 seconds...");
-			Thread.sleep(3000);
-			frame.dispose();
-		}
-		else {
-			//-just leave it
-		}
-	*/	
 		
 	}
 	

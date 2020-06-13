@@ -1,6 +1,7 @@
 package com.ardublock.ui.listener;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -16,21 +17,10 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
 
-import org.jfree.data.gantt.Task;
 
 import com.ardublock.core.Context;
 import com.ardublock.translator.AutoFormat;
@@ -40,10 +30,8 @@ import com.ardublock.translator.block.exception.SocketNullException;
 import com.ardublock.translator.block.exception.SubroutineNameDuplicatedException;
 import com.ardublock.translator.block.exception.SubroutineNotDeclaredException;
 import com.ardublock.ui.OpenblocksFrame;
-import com.ardublock.ui.SerialMonitorRunnable;
 import com.ardublock.ui.SerialUploadRunnable;
-import com.ardublock.ui.UploadTask;
-import com.ardublock.ui.Worker;
+
 
 import edu.mit.blocks.codeblocks.Block;
 import edu.mit.blocks.renderable.RenderableBlock;
@@ -62,30 +50,25 @@ public class GenerateCodeButtonListener implements ActionListener
 	private Thread uploadThread;
 	private SerialUploadRunnable uploadRunnable;
 	private String upload_cmd;
-	private SerialMonitor monitor;
 	private JTextArea textArea;
-	private JFrame frame;
-	private JScrollPane scrollPane;
 	
 	//- upload file parameters
 	private String sketchfileDir;
 	private String sketchfilePath;
-	private String arduinoDebugPath;
-	
-	//public GenerateCodeButtonListener(JFrame frame, Context context, SerialMonitor mon)
-	public GenerateCodeButtonListener(OpenblocksFrame oframe, Context context, SerialMonitor mon)
+
+	public GenerateCodeButtonListener(OpenblocksFrame oframe, Context context)
 	{
 		this.parentFrame = oframe;
 		this.context = context;
-		this.monitor = mon;
+		
+		this.textArea = oframe.uploadTextArea;
+		
 		workspace = context.getWorkspaceController().getWorkspace();
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
 		upload_cmd = null;
-		textArea = new JTextArea();
-		frame = new JFrame("Upload");
-		scrollPane = new JScrollPane(textArea);
-		uploadRunnable = new SerialUploadRunnable(frame, textArea, scrollPane);
+		
+		uploadRunnable = new SerialUploadRunnable(textArea);
 		uploadThread = new Thread(uploadRunnable);
 		
 		//-create temp_sketch directory in the executing folder of this .jar
@@ -98,9 +81,6 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		//- create file path to the .ino that will be created later.
 		sketchfilePath = sketchfileDir + "\\temp_sketch.ino";
-		
-		//- for 32-bit windows
-		arduinoDebugPath = "C:\\Program Files (x86)\\Arduino\\arduino_debug.exe";
 		
 	}
 
@@ -302,9 +282,13 @@ public class GenerateCodeButtonListener implements ActionListener
 	
 	public void actionPerformed(ActionEvent e)
 	{
+		textArea.setBackground(Color.white);
+		textArea.setText("");
+		textArea.append("\nGenerating Blocks...\n");
 		
 		if(generateC()) {
 			try {
+				textArea.append("\nBlocks successfully converted to C Code!\n");
 				compileAndUpload();
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -313,6 +297,10 @@ public class GenerateCodeButtonListener implements ActionListener
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		}
+		else {
+			textArea.append("\nBlock generation error!\n");
+			textArea.setBackground(Color.red);	
 		}
 	}
 	
@@ -362,7 +350,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		String board = null;
 		String selectedBoard = (String) parentFrame.boardOptions.getSelectedItem();
 		
-		upload_cmd = arduinoDebugPath;
+		//- call to context object gets the arduino command line path for Mac, Windows or Linux
+		upload_cmd = context.getArduinoCmdLine();
 
 		if (selectedBoard=="Barnabas Noggin") {
 			baud = "57600";
@@ -385,34 +374,13 @@ public class GenerateCodeButtonListener implements ActionListener
 		/**** Display Upload Status ****/
 		/*******************************/
 		
-	
-		textArea.setText("");
-		
-		textArea.setLineWrap(true);
-		textArea.setEditable(false);
-		textArea.setMargin(new Insets(12, 12, 12, 12));
-		
-		textArea.append("**************************************************************");
-		textArea.append("\n****************** Upload Settings ************************");
-		textArea.append("\n**************************************************************");
-		
 		textArea.append("\nPort: " + port);
 		textArea.append("\nBaudRate: " + baud);
 		textArea.append("\nBoard: " + board);
 		textArea.append("\nAVR Part: " + avr_part);
 		textArea.append("\nSketch Name: " + sketchfilePath);
-		
-		textArea.append("\n\n**************************************************************");
-		textArea.append("\n******************** Block Translation  ********************");
-		textArea.append("\n**************************************************************");
-		
-		textArea.append("\nBlocks successfully converted to C Code.\n");
-		
-		textArea.append("\n**************************************************************");
-		textArea.append("\n******************** Compiling C Code ********************");
-		textArea.append("\n**************************************************************");
-		
-        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+				
+   /*     frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
         frame.setSize(new Dimension(349, 500)); // set the frame size (you'll usually want to call frame.pack())
         frame.setResizable(false);
         
@@ -434,6 +402,8 @@ public class GenerateCodeButtonListener implements ActionListener
             }
         });
         
+        */
+        
         /* start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
          * 
@@ -451,7 +421,7 @@ public class GenerateCodeButtonListener implements ActionListener
         	//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
         	System.out.println("Starting upload thread...");
         	
-        	uploadRunnable = new SerialUploadRunnable(frame, textArea, scrollPane);
+        	uploadRunnable = new SerialUploadRunnable(textArea);
         	uploadRunnable.upload_cmd = upload_cmd;
         	
         	uploadThread = new Thread(uploadRunnable);

@@ -68,6 +68,27 @@ public class Context
 	
 	//final public static String VERSION_STRING = " ";
 	
+	public String getArduinoCmdLine() {
+		
+		String path = null;
+		
+		if (osType.equals(OsType.WINDOWS)) {
+			path = "C:\\Program Files (x86)\\Arduino\\arduino_debug.exe";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			path = "/Applications/Arduino.app/Contents/MacOS/Arduino";
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			path = "";
+		}
+		else {
+			path = "";
+		}
+	
+		return path;
+				
+	}
+	
 	public static Context getContext()
 	{
 		if (singletonContext == null)
@@ -207,6 +228,7 @@ public class Context
 		}
 		return Context.OsType.UNKNOWN;
 	}
+	
 	
 	public File getArduinoFile(String name)
 	{
