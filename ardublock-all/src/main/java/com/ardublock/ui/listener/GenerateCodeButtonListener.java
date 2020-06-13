@@ -68,7 +68,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		upload_cmd = null;
 		
-		uploadRunnable = new SerialUploadRunnable(textArea);
+		uploadRunnable = new SerialUploadRunnable(parentFrame);
 		uploadThread = new Thread(uploadRunnable);
 		
 		//-create temp_sketch directory in the executing folder of this .jar
@@ -306,28 +306,7 @@ public class GenerateCodeButtonListener implements ActionListener
 	
 	public void compileAndUpload() throws InterruptedException, ExecutionException
 	{
-		
-/*		Cmds for avrdude
-		
-		String avr_loc="C:\\users\\edwardbarnabas\\dev\\arduino-upload";
-		String avr_exe = '"' + avr_loc + "\\tools\\avr\\bin\\avrdude.exe" + '"';
-		String conf_file = '"' + avr_loc + "\\tools\\avr\\etc\\avrdude.conf" + '"';
-		String hex_file = '"' + avr_loc + "\\blank.hex" + '"';
-		String port = "COM5";
-		String baud = "57600";
-		String avr_part = "atmega328p";
-				
-		String cmd = avr_exe;
-		cmd += " -C" + conf_file;
-		cmd += " -v";
-		cmd += " -p" + avr_part;
-		cmd += " -carduino";
-		cmd += " -P" + port;
-		cmd += " -b" + baud;
-		cmd += " -D";
-		cmd += " -Uflash:w:" + hex_file + ":i";
-		
-*/
+
 		/***************************************************************/
 		/**** Settings To Upload To Arduino Nano (Older Bootloader) ****/
 		/***************************************************************/
@@ -337,7 +316,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		 * */
 
 		//- get port from the drop down list
-		String port = (String) parentFrame.portOptions.getSelectedItem();
+		String port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
 		
 		if (port == uiMessageBundle.getString("ardublock.conn_msg.no_conn")) {
 			JOptionPane.showMessageDialog(parentFrame, uiMessageBundle.getString("ardublock.conn_msg.no_port"), "Error", JOptionPane.ERROR_MESSAGE);
@@ -348,7 +327,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		String baud = null;
 		String avr_part = null;
 		String board = null;
-		String selectedBoard = (String) parentFrame.boardOptions.getSelectedItem();
+		String selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
 		
 		//- call to context object gets the arduino command line path for Mac, Windows or Linux
 		upload_cmd = context.getArduinoCmdLine();
@@ -366,13 +345,11 @@ public class GenerateCodeButtonListener implements ActionListener
 		}
 
 		//- add "/dev" to port path if on linux or mac
-
 		port = context.getPortString(port);
 		
 		upload_cmd += " --port " + port;
 		upload_cmd += " --upload " + sketchfilePath;
 		upload_cmd += " --verbose";
-		
 		
 		/*******************************/
 		/**** Display Upload Status ****/
@@ -383,31 +360,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		textArea.append("\nBoard: " + board);
 		textArea.append("\nAVR Part: " + avr_part);
 		textArea.append("\nSketch Name: " + sketchfilePath);
-				
-   /*     frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-        frame.setSize(new Dimension(349, 500)); // set the frame size (you'll usually want to call frame.pack())
-        frame.setResizable(false);
-        
-        frame.setLocationRelativeTo(null); // center the frame
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-        	//- run this code when the users closes the window.
-        	@Override
-            public void windowClosing(WindowEvent e) {
-        		
-        		//- interrupt thread and stop runnable if it was running
-        		if (uploadRunnable.keepRunning()) {
-        			uploadRunnable.doStop();
-        			uploadThread.interrupt(); //-interrupt thread so that the current process will stop
-        		}
-        		
-        		frame.dispose();
-            }
-        });
-        
-        */
-        
+				        
         /* start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
          * 
@@ -425,7 +378,7 @@ public class GenerateCodeButtonListener implements ActionListener
         	//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
         	System.out.println("Starting upload thread...");
         	
-        	uploadRunnable = new SerialUploadRunnable(textArea);
+        	uploadRunnable = new SerialUploadRunnable(parentFrame);
         	uploadRunnable.upload_cmd = upload_cmd;
         	
         	uploadThread = new Thread(uploadRunnable);

@@ -11,11 +11,13 @@ public class SerialUploadRunnable implements Runnable {
 	private boolean doStop;
 	public String upload_cmd;
 	private JTextArea textArea;
+	private OpenblocksFrame parentFrame;
 	public boolean timed_out = false;
 
-	public SerialUploadRunnable(JTextArea jTextArea) {
+	public SerialUploadRunnable(OpenblocksFrame oframe) {
+		parentFrame = oframe;
 		upload_cmd = null;
-		textArea = jTextArea;
+		textArea = parentFrame.uploadTextArea;
 		doStop = false;
 	}
 

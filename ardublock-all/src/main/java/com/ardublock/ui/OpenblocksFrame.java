@@ -56,30 +56,33 @@ public class OpenblocksFrame extends JFrame
 {
 
 	private static final long serialVersionUID = 2841155965906223806L;
+	
 	private Context context;
 	private JFileChooser fileChooser;
 	private FileFilter ffilter;
-	private SerialMonitorRunnable myRunnable;
-	private SerialMonitor monitor;
-	private JTextArea textArea; 
 	
 	
+	//- Serial Monitor 
+	public  JFrame serialMonitorframe;
+	public JScrollPane serialMonitorScrollPane;
+	public SerialMonitor monitor;
+	public JTextArea serialMonitortextArea; 
+	private SerialMonitorRunnable sm_Runnable;
 	private Thread serialMonitorThread;
-	private JFrame frame;
 	
+	//- Serial Port Detection
+	private SerialPortDetectRunnable spd_Runnable;
+	private Thread serialPortDetectThread;
 	
-	public JFrame uploadFrame;
+	//- Serial Port Upload
 	public JScrollPane uploadScrollPane;
 	public JTextArea uploadTextArea;
-	
-	private JScrollPane scrollPane;
-	
 	
 	
 	private ResourceBundle uiMessageBundle;
 	
-	public JComboBox<String> portOptions;
-	public JComboBox<String> boardOptions;
+	public JComboBox<String> portOptionsComboBox;
+	public JComboBox<String> boardOptionsComboBox;
 	
 	
 	public void addListener(OpenblocksFrameListener ofl)
@@ -114,13 +117,13 @@ public class OpenblocksFrame extends JFrame
 		fileChooser.addChoosableFileFilter(ffilter);
 		
 		/* Serial Monitor Objects */
-		textArea = new JTextArea();
+		serialMonitortextArea = new JTextArea();
 		monitor = new SerialMonitor();
-		frame = new JFrame("Serial Monitor");
+		serialMonitorframe = new JFrame("Serial Monitor");
 		
-		scrollPane = new JScrollPane(textArea);
-		myRunnable = new SerialMonitorRunnable(textArea, monitor, scrollPane);
-	    serialMonitorThread = new Thread(myRunnable);
+		serialMonitorScrollPane = new JScrollPane(serialMonitortextArea);
+		sm_Runnable = new SerialMonitorRunnable(this);
+	    serialMonitorThread = new Thread(sm_Runnable);
 	    
 	    /* Serial Upload Objects */
   		uploadTextArea = new JTextArea();
@@ -131,10 +134,21 @@ public class OpenblocksFrame extends JFrame
 		
   		uploadScrollPane = new JScrollPane(uploadTextArea);
   		uploadScrollPane.setPreferredSize(new Dimension(300,50));
-  		uploadFrame = new JFrame("Upload");
 	  
 		initOpenBlocks();
 	  
+	}
+	
+	public void updateAvailablePorts() {
+		//- update list of detected hardware
+		String[] portList = {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
+		String[] temp = SerialMonitor.getPorts();
+		if (temp != null) portList = temp;
+		portOptionsComboBox.removeAllItems();
+		
+		for (String x: portList) {
+			portOptionsComboBox.addItem(x);
+		}
 	}
 	
 	private void initOpenBlocks()
@@ -201,29 +215,23 @@ public class OpenblocksFrame extends JFrame
 		JButton redetectButton = new JButton(uiMessageBundle.getString("ardublock.ui.redetect"));
 		redetectButton.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
-				
-				//- update list of detected hardware
-				String[] portList = {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
-				String[] temp = SerialMonitor.getPorts();
-				if (temp != null) portList = temp;
-				portOptions.removeAllItems();
-				
-				for (String x: portList) {
-					portOptions.addItem(x);
-				}
-				
+				updateAvailablePorts();
 			}
 		});
 		
 		/* get port */
-		String[] portList = {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
-		String[] temp = SerialMonitor.getPorts();
-		if (temp != null) portList = temp;
-		portOptions = new JComboBox<String>(portList);
+		portOptionsComboBox = new JComboBox<String>();
+		updateAvailablePorts();
+		
+		/* continuously look for new hardware connections */
+		spd_Runnable = new SerialPortDetectRunnable(this);
+	    serialPortDetectThread = new Thread(spd_Runnable);
+	    serialPortDetectThread.start(); 
 		
 		/* add boards */
 		String[] boardList = {"Barnabas Noggin", "Arduino Uno"};
-		boardOptions = new JComboBox<String>(boardList);
+		boardOptionsComboBox = new JComboBox<String>(boardList);
+		
 		
 		/* add buttons to the GUI */
 		topPanel.add(newButton);
@@ -232,10 +240,11 @@ public class OpenblocksFrame extends JFrame
 		topPanel.add(openButton);
 		
 		/* upload and hardware detect interface */
+		
+		topPanel.add(portOptionsComboBox);
+		topPanel.add(boardOptionsComboBox);
 		topPanel.add(generateButton);
-		topPanel.add(portOptions);
-		topPanel.add(boardOptions);
-		topPanel.add(redetectButton);
+		//topPanel.add(redetectButton);
 		
 		
 		/*********************************************/
@@ -264,11 +273,11 @@ public class OpenblocksFrame extends JFrame
 		
 		bottomPanel.add(saveImageButton);
 		bottomPanel.add(websiteButton);
+		bottomPanel.add(serialMonitorButton);
 		
 		bottomPanel.add(uploadLabel);
 		bottomPanel.add(uploadScrollPane);
 		bottomPanel.add(versionLabel);
-		bottomPanel.add(serialMonitorButton);
 
 		/***** Position Items On Window ******/
 		this.add(topPanel, BorderLayout.NORTH);
@@ -460,7 +469,7 @@ public class OpenblocksFrame extends JFrame
 	
 	private void openSerialMonitor() {
 		
-        String port = (String) portOptions.getSelectedItem();
+        String port = (String) portOptionsComboBox.getSelectedItem();
         monitor.selectedPort = port;
         monitor.open();
         
@@ -472,20 +481,20 @@ public class OpenblocksFrame extends JFrame
 		
 		strInit += "****************************************************************\n";
 
-		textArea.setText(strInit);
+		serialMonitortextArea.setText(strInit);
 		
-        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-        frame.setSize(new Dimension(500, 240)); // set the frame size (you'll usually want to call frame.pack())
-        frame.setLocationRelativeTo(null); // center the frame
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
+		serialMonitorframe.getContentPane().add(serialMonitorScrollPane, BorderLayout.CENTER);
+		serialMonitorframe.setSize(new Dimension(500, 240)); // set the frame size (you'll usually want to call frame.pack())
+		serialMonitorframe.setLocationRelativeTo(null); // center the frame
+		serialMonitorframe.setVisible(true);
+		serialMonitorframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		serialMonitorframe.addWindowListener(new WindowAdapter() {
         	//- run this code when the users closes the window.
         	@Override
             public void windowClosing(WindowEvent e) {
         		monitor.close();
-        		myRunnable.doStop();
-        		frame.dispose();
+        		sm_Runnable.doStop();
+        		serialMonitorframe.dispose();
             }
         });
         
@@ -495,8 +504,8 @@ public class OpenblocksFrame extends JFrame
          * If the thread has been started and stopped before, just call doRun(), 
          * otherwise, start the thread since it has never been run before.
          */
-        if (myRunnable.keepRunning() == false) {
-        	myRunnable.doRun();
+        if (sm_Runnable.keepRunning() == false) {
+        	sm_Runnable.doRun();
         }
         else {
         	serialMonitorThread.start();        

@@ -11,12 +11,14 @@ public class SerialMonitorRunnable implements Runnable{
 	private JTextArea tArea;
 	private SerialMonitor monitor;
 	private JScrollPane scrollPane;
+	private OpenblocksFrame parentFrame;
 	
-	public SerialMonitorRunnable(JTextArea textArea, SerialMonitor mon, JScrollPane scroll) {
+	public SerialMonitorRunnable(OpenblocksFrame frame) {
 		doStop = false;
-		tArea = textArea;
-		monitor = mon;
-		scrollPane = scroll;
+		parentFrame = frame;
+		tArea = parentFrame.serialMonitortextArea;
+		monitor = parentFrame.monitor;
+		scrollPane = parentFrame.serialMonitorScrollPane;
 	}
 	
     public synchronized void doStop() {
