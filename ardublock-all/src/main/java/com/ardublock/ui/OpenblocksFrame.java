@@ -155,7 +155,7 @@ public class OpenblocksFrame extends JFrame
 		//- store the currently selected port
 		currentPort = (String) portOptionsComboBox.getSelectedItem();
 		
-		System.out.println("Detecting ports... Current port: " + currentPort + "...");
+		//System.out.println("Detecting ports... Current port: " + currentPort + "...");
 		
 		//- get current list of devices
 		String[] portArray = SerialMonitor.getPorts();
@@ -219,11 +219,11 @@ public class OpenblocksFrame extends JFrame
 		if(portOptionsModel.getIndexOf(currentPort) == -1) {
 			//- set selected item to the first element
 			portOptionsModel.setSelectedItem(portOptionsModel.getElementAt(0));
-			System.out.println("Device is gone!");
+			System.out.println("Device is gone! Selecting a new device.");
 		}
 		else {
-			//portOptionsModel.setSelectedItem(currentPort);
-			System.out.println("Device is still here!");
+			//- do nothing.  note: reselecting the device will prevent you from being able to select a device from GUI at times.
+			//System.out.println("Device is still here!");
 		}
 	
 	}
@@ -312,7 +312,7 @@ public class OpenblocksFrame extends JFrame
 	    serialPortDetectThread = new Thread(spd_Runnable);
 	    serialPortDetectThread.start(); 
 	    
-	    
+	    /*
 	    portOptionsComboBox.addActionListener(new ActionListener () {
 	    	
 			public void actionPerformed(ActionEvent e) {
@@ -322,7 +322,7 @@ public class OpenblocksFrame extends JFrame
 				//spd_Runnable.doStop();
 			}
 		});
-		/*
+		
 		portOptionsComboBox.addItemListener(new ItemListener() {
 			
 			public void itemStateChanged(ItemEvent arg0) {

@@ -335,9 +335,19 @@ public class GenerateCodeButtonListener implements ActionListener
 		upload_cmd = context.getArduinoCmdLine();
 		
 		//- check to see if arduino command line exists on system.  If not, throw an error
-		/*if (true) {
+		
+		System.out.println(upload_cmd);
+		File arduinoFile = new File(upload_cmd);
+		
+		//- if Arduino file doesn't exit, abort and notify the user to install Arduino first.
+		if (!arduinoFile.exists()) {
+			textArea.append("\n Arduino not installed!");
+			textArea.append("\n Cannot find file: " + upload_cmd);
+			textArea.setBackground(Color.red);
+			JOptionPane.showMessageDialog(parentFrame, "Arduino not installed!  To install, go to: https://www.arduino.cc/en/Main/Software", "Error", JOptionPane.ERROR_MESSAGE);
+			System.out.println("Arduino not installed!");
 			return;
-		}*/
+		}
 		
 
 		if (selectedBoard=="Barnabas Noggin") {
