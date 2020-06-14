@@ -11,6 +11,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -22,10 +24,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -49,8 +54,8 @@ import com.ardublock.ui.listener.SaveButtonListener;
 import com.ardublock.ui.listener.SerialMonitor;
 
 import edu.mit.blocks.controller.WorkspaceController;
+import edu.mit.blocks.workspace.Page;
 import edu.mit.blocks.workspace.Workspace;
-
 
 public class OpenblocksFrame extends JFrame
 {
@@ -58,6 +63,7 @@ public class OpenblocksFrame extends JFrame
 	private static final long serialVersionUID = 2841155965906223806L;
 	
 	private Context context;
+	
 	private JFileChooser fileChooser;
 	private FileFilter ffilter;
 	
@@ -73,7 +79,9 @@ public class OpenblocksFrame extends JFrame
 	//- Serial Port Detection
 	private SerialPortDetectRunnable spd_Runnable;
 	private Thread serialPortDetectThread;
-	
+	public JComboBox portOptionsComboBox;
+	public DefaultComboBoxModel portOptionsModel;
+
 	//- Serial Port Upload
 	public JScrollPane uploadScrollPane;
 	public JTextArea uploadTextArea;
@@ -81,7 +89,7 @@ public class OpenblocksFrame extends JFrame
 	
 	private ResourceBundle uiMessageBundle;
 	
-	public JComboBox<String> portOptionsComboBox;
+	
 	public JComboBox<String> boardOptionsComboBox;
 	
 	
@@ -102,7 +110,8 @@ public class OpenblocksFrame extends JFrame
 	}
 	
 	public OpenblocksFrame()
-	{
+	{		
+		/* Construct main Ardublock window */
 		context = Context.getContext();
 		this.setTitle(makeFrameTitle());
 		this.setSize(new Dimension(1024, 760));
@@ -111,6 +120,7 @@ public class OpenblocksFrame extends JFrame
 
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
+		/* File Handling Objects */
 		fileChooser = new JFileChooser();
 		ffilter = new FileNameExtensionFilter(uiMessageBundle.getString("ardublock.file.suffix"), "abp");
 		fileChooser.setFileFilter(ffilter);
@@ -141,19 +151,38 @@ public class OpenblocksFrame extends JFrame
 	
 	public void updateAvailablePorts() {
 		//- update list of detected hardware
-		String[] portList = {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
-		String[] temp = SerialMonitor.getPorts();
-		if (temp != null) portList = temp;
-		portOptionsComboBox.removeAllItems();
+		String[] portArray = SerialMonitor.getPorts();
 		
-		for (String x: portList) {
-			portOptionsComboBox.addItem(x);
+		if (portArray == null) {
+			portArray = new String[] {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
 		}
+		
+		List<String> list = Arrays.asList(portArray);
+		
+		//- remove ports that are no longer there
+		for (int i=0;i<portOptionsModel.getSize();i++) {				
+			if (!list.contains(portOptionsModel.getElementAt(i))) {
+				portOptionsModel.removeElementAt(i);
+				System.out.println("removing an element!");
+			}
+		}
+			
+		//- add any ports that weren't there before
+		for (String x: list) {
+			if (portOptionsModel.getIndexOf(x)==-1) {
+				portOptionsModel.addElement(x);
+				System.out.println("adding an element!");
+			}
+		}
+		
 	}
 	
 	private void initOpenBlocks()
 	{
+		
 		final Context context = Context.getContext();
+		
+		//- get block workspace object from context.  
 		final Workspace workspace = context.getWorkspace();
 		
 		workspace.addWorkspaceListener(new ArdublockWorkspaceListener(this));
@@ -211,26 +240,76 @@ public class OpenblocksFrame extends JFrame
 				}
 			}
 		});
-		
+		/*
 		JButton redetectButton = new JButton(uiMessageBundle.getString("ardublock.ui.redetect"));
 		redetectButton.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
 				updateAvailablePorts();
 			}
 		});
-		
+		*/
 		/* get port */
-		portOptionsComboBox = new JComboBox<String>();
+		
+		portOptionsModel = new DefaultComboBoxModel();
+		portOptionsComboBox= new JComboBox(portOptionsModel);
+		
 		updateAvailablePorts();
 		
 		/* continuously look for new hardware connections */
 		spd_Runnable = new SerialPortDetectRunnable(this);
 	    serialPortDetectThread = new Thread(spd_Runnable);
 	    serialPortDetectThread.start(); 
+	    
+	    
+	/*    portOptionsComboBox.addActionListener(new ActionListener () {
+	    	
+			public void actionPerformed(ActionEvent e) {
+				
+				System.out.println("combo action...");
+				
+				//spd_Runnable.doStop();
+			}
+		});
+		
+		portOptionsComboBox.addItemListener(new ItemListener() {
+			
+			public void itemStateChanged(ItemEvent arg0) {
+		        //Do Something
+				
+				System.out.println("item state changed...");
+				
+				//spd_Runnable.doRun();
+		    }
+		});
+	    */
 		
 		/* add boards */
 		String[] boardList = {"Barnabas Noggin", "Arduino Uno"};
 		boardOptionsComboBox = new JComboBox<String>(boardList);
+		
+		/* Zoom level of Ardublock */
+		
+		JLabel zoomLabel = new JLabel("Zoom: ");
+		
+		JButton zoomIn = new JButton("+");
+		zoomIn.addActionListener(new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+				double zoom = Page.getZoomLevel();
+				zoom -= 0.1;
+				Page.setZoomLevel(zoom);
+		        System.out.println("Zoom level: " + Page.getZoomLevel());
+			}
+		});
+		
+		JButton zoomOut = new JButton("-");
+		zoomOut.addActionListener(new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+				double zoom = Page.getZoomLevel();
+				zoom += 0.1;
+				Page.setZoomLevel(zoom);
+		        System.out.println("Zoom level: " + Page.getZoomLevel());
+			}
+		});
 		
 		
 		/* add buttons to the GUI */
@@ -244,6 +323,12 @@ public class OpenblocksFrame extends JFrame
 		topPanel.add(portOptionsComboBox);
 		topPanel.add(boardOptionsComboBox);
 		topPanel.add(generateButton);
+		
+		/* zooming can cause blocks to be inaccessbile.  leaving out for now */
+		//topPanel.add(zoomLabel);
+		//topPanel.add(zoomIn);
+		//topPanel.add(zoomOut);
+		
 		//topPanel.add(redetectButton);
 		
 		
@@ -282,6 +367,10 @@ public class OpenblocksFrame extends JFrame
 		/***** Position Items On Window ******/
 		this.add(topPanel, BorderLayout.NORTH);
 		this.add(bottomPanel, BorderLayout.SOUTH);
+		
+		
+		
+		/***** Add block work area to window ***/
 		this.add(workspace, BorderLayout.CENTER);
 		
 	}

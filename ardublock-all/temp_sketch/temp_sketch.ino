@@ -1,11 +1,17 @@
+#include <Servo.h>
+
+Servo servo_pin_9;
+
 void setup()
 {
-  Serial.begin(9600);
+  servo_pin_9.attach(9);
 }
 
 void loop()
 {
-  Serial.print("message");
-  Serial.println();
+  servo_pin_9.write( 1 );
+  servo_pin_9.write( 1 );
+  servo_pin_9.write( 1 );
+  servo_pin_9.write( 1 );
 }
 
