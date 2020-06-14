@@ -81,6 +81,7 @@ public class OpenblocksFrame extends JFrame
 	private Thread serialPortDetectThread;
 	public JComboBox portOptionsComboBox;
 	public DefaultComboBoxModel portOptionsModel;
+	public volatile String currentPort;
 
 	//- Serial Port Upload
 	public JScrollPane uploadScrollPane;
@@ -150,13 +151,20 @@ public class OpenblocksFrame extends JFrame
 	}
 	
 	public void updateAvailablePorts() {
-		//- update list of detected hardware
+		
+		//- store the currently selected port
+		currentPort = (String) portOptionsComboBox.getSelectedItem();
+		
+		System.out.println("Detecting ports... Current port: " + currentPort + "...");
+		
+		//- get current list of devices
 		String[] portArray = SerialMonitor.getPorts();
 		
+		//- if there are no ports, create single element array that has no_conn error message
 		if (portArray == null) {
 			portArray = new String[] {uiMessageBundle.getString("ardublock.conn_msg.no_conn")};
 		}
-		
+
 		List<String> list = Arrays.asList(portArray);
 		
 		//- remove ports that are no longer there
@@ -168,13 +176,56 @@ public class OpenblocksFrame extends JFrame
 		}
 			
 		//- add any ports that weren't there before
+		
 		for (String x: list) {
+			
 			if (portOptionsModel.getIndexOf(x)==-1) {
-				portOptionsModel.addElement(x);
-				System.out.println("adding an element!");
+				
+				if (currentPort == null) {
+					portOptionsModel.addElement(x);	
+					//System.out.println("Current Port: " + currentPort + ". adding element: " + x + " at the end of the list.");
+				}
+				else {
+					
+					//- add port elements in ascending alphabetical order
+					for (int i=0; i<portOptionsModel.getSize();i++) {
+						if (x.compareTo((String) portOptionsModel.getElementAt(i)) < 0) {
+							
+							int index;
+		
+							if (i == 0) index = 0;
+							else index = i-1;
+							
+							portOptionsModel.insertElementAt(x, index);
+							
+							System.out.println("Current Port: " + currentPort + ". inserting element: " + x + "at index: " + index);
+							
+							break; //- break out of for loop iteration
+						}
+						//- if at the end of the list, just add it
+						if (i==portOptionsModel.getSize()-1) {
+							portOptionsModel.addElement(x);	
+							break;
+						}
+				
+					}
+					
+				}
+				
 			}
 		}
 		
+		//- make sure that same device is selected if it's still there from last time we checked for devices
+		if(portOptionsModel.getIndexOf(currentPort) == -1) {
+			//- set selected item to the first element
+			portOptionsModel.setSelectedItem(portOptionsModel.getElementAt(0));
+			System.out.println("Device is gone!");
+		}
+		else {
+			//portOptionsModel.setSelectedItem(currentPort);
+			System.out.println("Device is still here!");
+		}
+	
 	}
 	
 	private void initOpenBlocks()
@@ -253,6 +304,7 @@ public class OpenblocksFrame extends JFrame
 		portOptionsModel = new DefaultComboBoxModel();
 		portOptionsComboBox= new JComboBox(portOptionsModel);
 		
+		currentPort = null;
 		updateAvailablePorts();
 		
 		/* continuously look for new hardware connections */
@@ -261,7 +313,7 @@ public class OpenblocksFrame extends JFrame
 	    serialPortDetectThread.start(); 
 	    
 	    
-	/*    portOptionsComboBox.addActionListener(new ActionListener () {
+	    portOptionsComboBox.addActionListener(new ActionListener () {
 	    	
 			public void actionPerformed(ActionEvent e) {
 				
@@ -270,18 +322,24 @@ public class OpenblocksFrame extends JFrame
 				//spd_Runnable.doStop();
 			}
 		});
-		
+		/*
 		portOptionsComboBox.addItemListener(new ItemListener() {
 			
 			public void itemStateChanged(ItemEvent arg0) {
-		        //Do Something
-				
+
 				System.out.println("item state changed...");
 				
-				//spd_Runnable.doRun();
+				spd_Runnable.doStop();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				spd_Runnable.doRun();
 		    }
 		});
-	    */
+*/
 		
 		/* add boards */
 		String[] boardList = {"Barnabas Noggin", "Arduino Uno"};
