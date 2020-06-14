@@ -1,10 +1,12 @@
 # Ardublock-Standalone
-Ardublock version that can run independent of Arduino IDE
 
-General Architecture:
-- 
+This project is a branch from the original Ardublock project (link below) from @taweili.  We plan to use this with our robotics students, but it can be adapted to any Arduino-based platform.  Arduino must be install on a system for it it t work.  
 
-To Compile:
+General Software Architecture:
+- Uses JSerialComm library to access comm ports for detection and serial monitor
+- Uses Arduino command line tools to compile and upload code (Windows: arduino_debug.exe, Mac: 
+
+Notes on compiling:
 - Linux: https://hackaday.io/project/166167-barnabas-robotics-ardublock-upgrade
 - Windows: https://docs.google.com/document/d/1PI4S1P38JGV4XWac7j-tIMILE7Mu8z1q6YpewNNaw1A/edit
 
@@ -15,9 +17,9 @@ Usage:
 - Arduino IDE needs to be installed but not running in order for the code to work since it runs using arduino_debug.exe
 
 Notes:
-20200614 - Now works with Mac
-20200610 - Only tested on 64-bit Windows.
-2020- Took previous version of Ardublock and created a standalone version by making calls to arduino_debug.exe and JSerial.
+- 20200614: Now works with Mac
+- 20200610: Only tested on 64-bit Windows.
+- 20200610: Took previous version of Ardublock and created a standalone version by making calls to arduino_debug.exe and JSerial.
 
 Credits:
 - Original Ardublock project: https://github.com/taweili/ardublock
