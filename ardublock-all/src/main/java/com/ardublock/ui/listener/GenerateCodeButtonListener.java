@@ -319,8 +319,10 @@ public class GenerateCodeButtonListener implements ActionListener
 		String port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
 		
 		if (port == uiMessageBundle.getString("ardublock.conn_msg.no_conn")) {
-			JOptionPane.showMessageDialog(parentFrame, uiMessageBundle.getString("ardublock.conn_msg.no_port"), "Error", JOptionPane.ERROR_MESSAGE);
+			//JOptionPane.showMessageDialog(parentFrame, uiMessageBundle.getString("ardublock.conn_msg.no_port"), "Error", JOptionPane.ERROR_MESSAGE);
 			System.out.println(uiMessageBundle.getString("ardublock.conn_msg.no_port"));
+			textArea.append("\n" + uiMessageBundle.getString("ardublock.conn_msg.no_port"));
+			textArea.setBackground(Color.red);
 			return;
 		}
 		
@@ -331,6 +333,12 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		//- call to context object gets the arduino command line path for Mac, Windows or Linux
 		upload_cmd = context.getArduinoCmdLine();
+		
+		//- check to see if arduino command line exists on system.  If not, throw an error
+		/*if (true) {
+			return;
+		}*/
+		
 
 		if (selectedBoard=="Barnabas Noggin") {
 			baud = "57600";
