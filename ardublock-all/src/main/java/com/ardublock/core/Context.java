@@ -36,8 +36,23 @@ import edu.mit.blocks.workspace.Workspace;
 
 public class Context
 {
+	/* select the version of ardublock that you would like to compile 
+	 * 
+	 * ArdublockVersion = all - includes all libraries
+	 * ArdublockVersion = bot - Barnabas-Bot only
+	 * 
+	 * 
+	 * 
+	 */
+	//final public String ArdublockVersion = "all";
+	final public String ArdublockVersion = "bot";
+	
 	public final static String LANG_DTD_PATH = "/com/ardublock/block/lang_def.dtd";
-	public final static String ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
+	
+	
+	public static String ARDUBLOCK_LANG_PATH;
+	
+	
 	public final static String DEFAULT_ARDUBLOCK_PROGRAM_PATH = "/com/ardublock/default.abp";
 	public final static String ARDUINO_VERSION_UNKNOWN = "unknown";
 	public final boolean isNeedAutoFormat = true;
@@ -53,8 +68,8 @@ public class Context
 	private String arduinoVersionString = ARDUINO_VERSION_UNKNOWN;
 	private OsType osType; 
 
-	final public static String APP_NAME = "ArduBlock";
-	
+	public static String APP_NAME;
+
 	private Editor editor;
 	
 	public enum OsType
@@ -146,7 +161,7 @@ public class Context
 			path = "";
 		}
 		else {
-			path = "";
+			path = "Unknown OS.  I don't know the path!";
 		}
 	
 		return path;
@@ -173,6 +188,21 @@ public class Context
 	
 	private Context()
 	{
+		
+		switch(ArdublockVersion) {
+		  case "all":
+			  APP_NAME = "ArduBlock";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
+		    break;
+		  case "bot":
+			  APP_NAME = "Ardublock: Barnabas-Bot";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock_bot.xml";
+		    break;
+		  default:
+			  APP_NAME = "Ardublock";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
+		}
+		
 		workspaceController = new WorkspaceController();
 		
 		resetWorksapce();
@@ -186,6 +216,8 @@ public class Context
 		isInArduino = false;
 		
 		osType = determineOsType();
+		
+		
 	}
 	
 	public void resetWorksapce()
@@ -203,7 +235,10 @@ public class Context
 		workspaceController.setLangResourceBundle(ResourceBundle.getBundle("com/ardublock/block/ardublock"));
 		workspaceController.setStyleList(list);
 		workspaceController.setLangDefDtd(this.getClass().getResourceAsStream(LANG_DTD_PATH));
+		
 		workspaceController.setLangDefStream(this.getClass().getResourceAsStream(ARDUBLOCK_LANG_PATH));
+		
+		
 		workspaceController.loadFreshWorkspace();
 		
 		loadDefaultArdublockProgram();
