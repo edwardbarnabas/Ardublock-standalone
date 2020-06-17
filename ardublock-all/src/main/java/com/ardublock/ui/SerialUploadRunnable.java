@@ -225,7 +225,7 @@ public class SerialUploadRunnable implements Runnable {
 			textArea.setBackground(Color.red);
 			break;
 		  default:
-			textArea.append("\nUpload Failed! Unknown Error.\n\n");
+			textArea.append("\nUpload Failed! Unknown Error code: " + exitStatus + "\n\n");
 			textArea.setBackground(Color.red);
 			break;
 		}

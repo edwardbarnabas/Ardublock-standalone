@@ -44,8 +44,8 @@ public class Context
 	 * 
 	 * 
 	 */
-	//final public String ArdublockVersion = "all";
-	final public String ArdublockVersion = "bot";
+	final public String ArdublockVersion = "all";
+	//final public String ArdublockVersion = "bot";
 	
 	public final static String LANG_DTD_PATH = "/com/ardublock/block/lang_def.dtd";
 	

@@ -144,7 +144,7 @@ public class OpenblocksFrame extends JFrame
   		uploadTextArea.setMargin(new Insets(5, 5, 5, 5));
 		
   		uploadScrollPane = new JScrollPane(uploadTextArea);
-  		uploadScrollPane.setPreferredSize(new Dimension(300,50));
+  		uploadScrollPane.setPreferredSize(new Dimension(300,75));
 	  
 		initOpenBlocks();
 	  

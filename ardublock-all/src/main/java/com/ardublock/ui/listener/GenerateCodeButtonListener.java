@@ -378,6 +378,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		textArea.append("\nBoard: " + board);
 		textArea.append("\nAVR Part: " + avr_part);
 		textArea.append("\nSketch Name: " + sketchfilePath);
+		
+		textArea.append("\nArduino Command: " + upload_cmd +"\n");
 				        
         /* start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
