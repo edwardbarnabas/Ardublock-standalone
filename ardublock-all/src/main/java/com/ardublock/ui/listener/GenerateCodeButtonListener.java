@@ -81,7 +81,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		}
 		
 		//- create file path to the .ino that will be created later.
-		sketchfilePath = sketchfileDir + context.getSketchName();
+		//- add quotes around file path in case there are whitespaces in the path
+		sketchfilePath = "\"" + sketchfileDir + context.getSketchName() + "\"";
 	}
 
 	public boolean generateC() {
