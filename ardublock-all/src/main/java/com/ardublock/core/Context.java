@@ -158,7 +158,7 @@ public class Context
 			path = "/Applications/Arduino.app/Contents/MacOS/Arduino";
 		}
 		else if (osType.equals(OsType.LINUX)) {
-			path = "";
+			path = "$HOME/arduino-1.8.12/";
 		}
 		else {
 			path = "Unknown OS.  I don't know the path!";
