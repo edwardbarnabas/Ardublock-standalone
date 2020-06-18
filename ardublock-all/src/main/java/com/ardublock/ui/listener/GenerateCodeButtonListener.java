@@ -82,7 +82,10 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		//- create file path to the .ino that will be created later.
 		//- add quotes around file path in case there are whitespaces in the path
-		sketchfilePath = "\"" + sketchfileDir + context.getSketchName() + "\"";
+		
+		//sketchfilePath = "\"" + sketchfileDir + context.getSketchName() + "\"";
+		
+		sketchfilePath = sketchfileDir + context.getSketchName();
 	}
 
 	public boolean generateC() {
@@ -367,7 +370,11 @@ public class GenerateCodeButtonListener implements ActionListener
 		port = context.getPortString(port);
 		
 		upload_cmd += " --port " + port;
-		upload_cmd += " --upload " + sketchfilePath;
+		
+		//- add quotes to sketch file path to take care of white spaces
+		upload_cmd += " --upload " + "\"" + sketchfilePath + "\"";
+		
+		
 		upload_cmd += " --verbose";
 		
 		/*******************************/
@@ -414,7 +421,17 @@ public class GenerateCodeButtonListener implements ActionListener
 	public void doSaveIno(String content)
 	{	
 		try {
-            File newTextFile = new File(sketchfilePath);
+			
+			//- delete the file first if it exists
+			 File newTextFile = new File(sketchfilePath);
+			 if (newTextFile.exists()){
+				 newTextFile.delete();
+				 System.out.println("deleting sketchfile at: " + sketchfilePath);
+			 }  
+			
+			//- create text file
+			System.out.println("creating sketchfile at: " + sketchfilePath);
+            newTextFile = new File(sketchfilePath);
             FileWriter fw = new FileWriter(newTextFile);
             fw.write(content);
             fw.close();
@@ -422,6 +439,7 @@ public class GenerateCodeButtonListener implements ActionListener
         } catch (IOException iox) {
             //do stuff with exception
             iox.printStackTrace();
+            System.out.println("Error creating sketch file! Error: " + iox.toString());
         }
 	}
 }
