@@ -40,13 +40,12 @@ public class Context
 	 * 
 	 * ArdublockVersion = all - includes all libraries
 	 * ArdublockVersion = bot - Barnabas-Bot only
-	 * 
+	 * ArdublockVersion = racer - Barnabas racer only
 	 * 
 	 * 
 	 */
-	final public String ArdublockVersion = "all";
-	//final public String ArdublockVersion = "bot";
-	
+	public String ArdublockVersion = "Barnabas Bot";
+	public double zoom_level = 2.5;
 	public final static String LANG_DTD_PATH = "/com/ardublock/block/lang_def.dtd";
 	
 	
@@ -189,23 +188,9 @@ public class Context
 	private Context()
 	{
 		
-		switch(ArdublockVersion) {
-		  case "all":
-			  APP_NAME = "ArduBlock";
-			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
-		    break;
-		  case "bot":
-			  APP_NAME = "Ardublock: Barnabas-Bot";
-			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock_bot.xml";
-		    break;
-		  default:
-			  APP_NAME = "Ardublock";
-			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
-		}
-		
 		workspaceController = new WorkspaceController();
 		
-		resetWorksapce();
+		resetWorkspace();
 		
 		workspace = workspaceController.getWorkspace();
 		workspaceChanged = false;
@@ -220,8 +205,25 @@ public class Context
 		
 	}
 	
-	public void resetWorksapce()
+	public void resetWorkspace()
 	{
+		switch(ArdublockVersion) {
+		  case "All":
+			  APP_NAME = "ArduBlock";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock.xml";
+		    break;
+		  case "Barnabas Bot":
+			  APP_NAME = "Ardublock: Barnabas Bot";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock_barnabas_bot.xml";
+		    break;
+		  case "Barnabas Racer":
+			  APP_NAME = "Ardublock: Barnabas Racer";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock_barnabas_racer.xml";
+		    break;
+		  default:
+			  APP_NAME = "Barnabas Bot";
+			  ARDUBLOCK_LANG_PATH = "/com/ardublock/block/ardublock_barnabas_bot.xml";
+		}
 
 		// Style list
 		List<String[]> list = new ArrayList<String[]>();
@@ -266,7 +268,7 @@ public class Context
         //- set how zoomed in the workspace is.
         //- < 1 = zoomed in, > 1 = zoomed out
         
-        Page.setZoomLevel(2.5);
+        Page.setZoomLevel(zoom_level);
         System.out.println("Zoom level: " + Page.getZoomLevel());
         
         page.addBlock(renderableBlock);
@@ -371,7 +373,10 @@ public class Context
 			saveFilePath = savedFile.getAbsolutePath();
 			saveFileName = savedFile.getName();
 			workspaceController.resetWorkspace();
-			workspaceController.loadProjectFromPath(saveFilePath);
+			workspaceController.loadProjectFromPath(saveFilePath);	
+			
+			
+			
 			didLoad();
 		}
 	}

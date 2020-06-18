@@ -87,6 +87,9 @@ public class OpenblocksFrame extends JFrame
 	public JScrollPane uploadScrollPane;
 	public JTextArea uploadTextArea;
 	
+	//- Porgram Options
+	public JComboBox programComboBox;
+	
 	
 	private ResourceBundle uiMessageBundle;
 	
@@ -412,7 +415,27 @@ public class OpenblocksFrame extends JFrame
 		});
 		JLabel versionLabel = new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version"));
 		JLabel uploadLabel = new JLabel("Upload Status: ");
-
+		
+		/* add boards */
+		String[] programList = {"Barnabas Bot", "Barnabas Racer"};
+		programComboBox = new JComboBox<String>(programList);
+		programComboBox.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				
+				System.out.println("item state changed to: " + programComboBox.getSelectedItem() + ".  Current Ardublock Version = " + context.ArdublockVersion);
+				
+				//- ignore if selected program is same as the current one. 
+				if (context.ArdublockVersion == programComboBox.getSelectedItem()) {
+					System.out.println("skipped");
+					return;
+				}
+				else {
+					changeProgramSpace();
+				}
+			}
+			
+		});
 		
 		bottomPanel.add(saveImageButton);
 		bottomPanel.add(websiteButton);
@@ -421,6 +444,7 @@ public class OpenblocksFrame extends JFrame
 		bottomPanel.add(uploadLabel);
 		bottomPanel.add(uploadScrollPane);
 		bottomPanel.add(versionLabel);
+		bottomPanel.add(programComboBox);
 
 		/***** Position Items On Window ******/
 		this.add(topPanel, BorderLayout.NORTH);
@@ -474,7 +498,9 @@ public class OpenblocksFrame extends JFrame
 			{
 				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				context.loadArduBlockFile(savedFile);
+				System.out.println("setting zoom");
 				context.setWorkspaceChanged(false);
+				
 			}
 			catch (IOException e)
 			{
@@ -484,6 +510,7 @@ public class OpenblocksFrame extends JFrame
 			finally
 			{
 				this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				
 			}
 		}
 	}
@@ -595,10 +622,32 @@ public class OpenblocksFrame extends JFrame
 			}
 		}
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		context.resetWorksapce();
+		context.resetWorkspace();
 		context.setWorkspaceChanged(false);
 		this.setTitle(this.makeFrameTitle());
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+	
+	public void changeProgramSpace()
+	{
+	
+		int optionValue = JOptionPane.showOptionDialog(this, uiMessageBundle.getString("message.question.changeworkspace_on_workspace_changed"), uiMessageBundle.getString("message.title.question"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+		if (optionValue == JOptionPane.NO_OPTION)
+		{
+			//- change combobox selection back to the current version.
+			programComboBox.setSelectedItem((String)context.ArdublockVersion);
+			System.out.println("Setting combo box back to original: " + context.ArdublockVersion);
+			return;
+		}
+		else {
+			context.ArdublockVersion = (String) programComboBox.getSelectedItem();
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			context.resetWorkspace();
+			context.setWorkspaceChanged(false);
+			this.setTitle(this.makeFrameTitle());
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+		}
 	}
 
 	private File checkFileSuffix(File saveFile)
