@@ -1,5 +1,6 @@
 package com.ardublock.core;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import processing.app.Editor;
 
+import com.ardublock.ui.OpenblocksFrame;
 import com.ardublock.ui.listener.OpenblocksFrameListener;
 
 import edu.mit.blocks.codeblocks.Block;
@@ -240,8 +242,12 @@ public class Context
 		
 		workspaceController.setLangDefStream(this.getClass().getResourceAsStream(ARDUBLOCK_LANG_PATH));
 		
-		
 		workspaceController.loadFreshWorkspace();
+		
+		//- set how zoomed in the workspace is.
+        //- < 1 = zoomed in, > 1 = zoomed out
+		Page.setZoomLevel(zoom_level);
+        System.out.println("Zoom level: " + Page.getZoomLevel());
 		
 		loadDefaultArdublockProgram();
 		
@@ -264,13 +270,7 @@ public class Context
         FactoryRenderableBlock factoryRenderableBlock = new FactoryRenderableBlock(workspace, manager, newBlock.getBlockID());
         RenderableBlock renderableBlock = factoryRenderableBlock.createNewInstance();
         renderableBlock.setLocation(100, 100);
-        
-        //- set how zoomed in the workspace is.
-        //- < 1 = zoomed in, > 1 = zoomed out
-        
-        Page.setZoomLevel(zoom_level);
-        System.out.println("Zoom level: " + Page.getZoomLevel());
-        
+
         page.addBlock(renderableBlock);
         
         
@@ -366,16 +366,23 @@ public class Context
 		didSave();
 	}
 	
-	public void loadArduBlockFile(File savedFile) throws IOException
+	public void loadArduBlockFile(File savedFile, OpenblocksFrame oframe) throws IOException
 	{
 		if (savedFile != null)
 		{
+
+			//- this code creates a new file
+			oframe.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			resetWorkspace();
+			setWorkspaceChanged(false);
+			oframe.setTitle(oframe.makeFrameTitle());
+			oframe.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
+			//- load the file.  Calling workspaceController.resetworkspace() causes zoom to go back to default
+			//- so not calling it here.
 			saveFilePath = savedFile.getAbsolutePath();
 			saveFileName = savedFile.getName();
-			workspaceController.resetWorkspace();
 			workspaceController.loadProjectFromPath(saveFilePath);	
-			
-			
 			
 			didLoad();
 		}

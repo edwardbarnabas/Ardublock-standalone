@@ -497,8 +497,7 @@ public class OpenblocksFrame extends JFrame
 			try
 			{
 				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				context.loadArduBlockFile(savedFile);
-				System.out.println("setting zoom");
+				context.loadArduBlockFile(savedFile,this);
 				context.setWorkspaceChanged(false);
 				
 			}
