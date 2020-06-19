@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -147,7 +149,7 @@ public class OpenblocksFrame extends JFrame
   		uploadTextArea.setMargin(new Insets(5, 5, 5, 5));
 		
   		uploadScrollPane = new JScrollPane(uploadTextArea);
-  		uploadScrollPane.setPreferredSize(new Dimension(300,75));
+  		uploadScrollPane.setPreferredSize(new Dimension(600,75));
 	  
 		initOpenBlocks();
 	  
@@ -294,14 +296,7 @@ public class OpenblocksFrame extends JFrame
 				}
 			}
 		});
-		/*
-		JButton redetectButton = new JButton(uiMessageBundle.getString("ardublock.ui.redetect"));
-		redetectButton.addActionListener(new ActionListener () {
-			public void actionPerformed(ActionEvent e) {
-				updateAvailablePorts();
-			}
-		});
-		*/
+
 		/* get port */
 		
 		portOptionsModel = new DefaultComboBoxModel();
@@ -314,36 +309,7 @@ public class OpenblocksFrame extends JFrame
 		spd_Runnable = new SerialPortDetectRunnable(this);
 	    serialPortDetectThread = new Thread(spd_Runnable);
 	    serialPortDetectThread.start(); 
-	    
-	    /*
-	    portOptionsComboBox.addActionListener(new ActionListener () {
-	    	
-			public void actionPerformed(ActionEvent e) {
-				
-				System.out.println("combo action...");
-				
-				//spd_Runnable.doStop();
-			}
-		});
-		
-		portOptionsComboBox.addItemListener(new ItemListener() {
-			
-			public void itemStateChanged(ItemEvent arg0) {
 
-				System.out.println("item state changed...");
-				
-				spd_Runnable.doStop();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				spd_Runnable.doRun();
-		    }
-		});
-*/
-		
 		/* add boards */
 		String[] boardList = {"Barnabas Noggin", "Arduino Uno"};
 		boardOptionsComboBox = new JComboBox<String>(boardList);
@@ -372,51 +338,7 @@ public class OpenblocksFrame extends JFrame
 			}
 		});
 		
-		
-		/* add buttons to the GUI */
-		topPanel.add(newButton);
-		topPanel.add(saveButton);
-		topPanel.add(saveAsButton);
-		topPanel.add(openButton);
-		
-		/* upload and hardware detect interface */
-		
-		topPanel.add(portOptionsComboBox);
-		topPanel.add(boardOptionsComboBox);
-		topPanel.add(generateButton);
-		
-		/* zooming can cause blocks to be inaccessbile.  leaving out for now */
-		//topPanel.add(zoomLabel);
-		//topPanel.add(zoomIn);
-		//topPanel.add(zoomOut);
-		
-		//topPanel.add(redetectButton);
-		
-		
-		/*********************************************/
-		/**** Generate Bottom Panel Of The Window ****/
-		/*********************************************/
-		
-		JPanel bottomPanel = new JPanel();
-		JButton websiteButton = new JButton(uiMessageBundle.getString("ardublock.ui.website"));
-		websiteButton.addActionListener(new ActionListener () {
-			public void actionPerformed(ActionEvent e) {
-			    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-			    URL url;
-			    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-			        try {
-						url = new URL("https://www.barnabasrobotics.com");
-			            desktop.browse(url.toURI());
-			        } catch (Exception e1) {
-			            e1.printStackTrace();
-			        }
-			    }
-			}
-		});
-		JLabel versionLabel = new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version"));
-		JLabel uploadLabel = new JLabel("Upload Status: ");
-		
-		/* add boards */
+		/* add robot projects */
 		String[] programList = {"Barnabas Bot", "Barnabas Racer"};
 		programComboBox = new JComboBox<String>(programList);
 		programComboBox.addActionListener(new ActionListener() {
@@ -437,20 +359,76 @@ public class OpenblocksFrame extends JFrame
 			
 		});
 		
-		bottomPanel.add(saveImageButton);
-		bottomPanel.add(websiteButton);
-		bottomPanel.add(serialMonitorButton);
+		JButton websiteButton = new JButton(uiMessageBundle.getString("ardublock.ui.website"));
+		websiteButton.addActionListener(new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+			    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+			    URL url;
+			    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+			        try {
+						url = new URL("https://www.barnabasrobotics.com");
+			            desktop.browse(url.toURI());
+			        } catch (Exception e1) {
+			            e1.printStackTrace();
+			        }
+			    }
+			}
+		});
 		
-		bottomPanel.add(uploadLabel);
+		JPanel jp1 = new JPanel();
+		JPanel jp2 = new JPanel();
+		JPanel jp3 = new JPanel();
+		JPanel jp4 = new JPanel();
+		JPanel jp5 = new JPanel();
+		
+		jp1.add(newButton);
+		jp1.add(saveButton);
+		jp1.add(saveImageButton);
+		
+		jp1.add(openButton);
+		jp1.add(saveAsButton);
+		jp1.add(websiteButton);
+		
+		jp1.setLayout(new GridLayout(2,3));
+		
+		jp2.add(new JLabel("Select Port"));
+		jp2.add(portOptionsComboBox);
+		jp2.setLayout(new GridLayout(2,1));
+		
+		jp3.add(new JLabel("Select Hardware"));
+		jp3.add(boardOptionsComboBox);
+		jp3.setLayout(new GridLayout(2,1));
+		
+		jp4.add(new JLabel("Select Project"));
+		jp4.add(programComboBox);
+		jp4.setLayout(new GridLayout(2,1));
+		
+		jp5.add(generateButton);
+		jp5.add(serialMonitorButton);
+		jp5.setLayout(new GridLayout(2,1));
+		
+		
+		topPanel.add(jp1);
+		topPanel.add(jp2);
+		topPanel.add(jp3);
+		topPanel.add(jp4);
+		topPanel.add(jp5);
+		
+		/*********************************************/
+		/**** Generate Bottom Panel Of The Window ****/
+		/*********************************************/
+		
+		JPanel bottomPanel = new JPanel();
+		JLabel versionLabel = new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version"));
+		
+		bottomPanel.add(new JLabel("Upload Status: "));
 		bottomPanel.add(uploadScrollPane);
 		bottomPanel.add(versionLabel);
-		bottomPanel.add(programComboBox);
+		 
 
 		/***** Position Items On Window ******/
 		this.add(topPanel, BorderLayout.NORTH);
 		this.add(bottomPanel, BorderLayout.SOUTH);
-		
-		
 		
 		/***** Add block work area to window ***/
 		this.add(workspace, BorderLayout.CENTER);
