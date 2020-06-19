@@ -1643,7 +1643,7 @@
 			</BlockConnectors>
 		</BlockGenus>
   
-		<BlockGenus name="df_servo" kind="command" color="255 102 0" initlabel="bg.df_servo">
+		<BlockGenus name="br_servo" kind="command" color="29 100 155" initlabel="bg.br_servo">
 			<description>
 				<text>set a pin to pwm</text>
 			</description>
@@ -1662,7 +1662,7 @@
 			</Images>
 		</BlockGenus>
 		
-				<BlockGenus name="df_led" kind="command" color="255 102 0" initlabel="bg.df_led">
+				<BlockGenus name="br_led" kind="command" color="0 200 0" initlabel="bg.br_led">
 			<description>
 				<text>DFRobot LED Module</text>
 			</description>

@@ -192,20 +192,16 @@ public class Context
 	{
 		
 		workspaceController = new WorkspaceController();
+		this.workspace = workspaceController.getWorkspace();
 		
-		resetWorkspace();
-		
-		workspace = workspaceController.getWorkspace();
 		workspaceChanged = false;
 		highlightBlockSet = new HashSet<RenderableBlock>();
 		ofls = new HashSet<OpenblocksFrameListener>();
-		this.workspace = workspaceController.getWorkspace();
-		
 		isInArduino = false;
-		
 		osType = determineOsType();
 		
-		
+		resetWorkspace();
+				
 	}
 	
 	public void resetWorkspace()
@@ -260,7 +256,9 @@ public class Context
 	private void loadDefaultArdublockProgram()
 	{
 		
-		Workspace workspace = workspaceController.getWorkspace();
+		//Workspace workspace = workspaceController.getWorkspace();
+		
+		workspace = workspaceController.getWorkspace();
 		Page page = workspace.getPageNamed("Ardublock Workspace");
 		
 		FactoryManager manager = workspace.getFactoryManager();
@@ -273,8 +271,6 @@ public class Context
         renderableBlock.setLocation(100, 100);
 
         page.addBlock(renderableBlock);
-        
-        
         
 	}
 	
@@ -371,16 +367,13 @@ public class Context
 	{
 		if (savedFile != null)
 		{
+			workspaceController.resetWorkspace();
 
-			//- this code creates a new file
-			oframe.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			resetWorkspace();
-			setWorkspaceChanged(false);
-			oframe.setTitle(oframe.makeFrameTitle());
-			oframe.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
-			//- load the file.  Calling workspaceController.resetworkspace() causes zoom to go back to default
-			//- so not calling it here.
+			//- set how zoomed in the workspace is.
+	        //- < 1 = zoomed in, > 1 = zoomed out
+			Page.setZoomLevel(zoom_level);
+	        System.out.println("Zoom level: " + Page.getZoomLevel());
+	        
 			saveFilePath = savedFile.getAbsolutePath();
 			saveFileName = savedFile.getName();
 			workspaceController.loadProjectFromPath(saveFilePath);	

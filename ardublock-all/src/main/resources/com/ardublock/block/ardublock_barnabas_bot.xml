@@ -1664,7 +1664,7 @@
 		
 				<BlockGenus name="br_led" kind="command" color="0 200 0" initlabel="bg.br_led">
 			<description>
-				<text>DFRobot LED Module</text>
+				<text>LED Module</text>
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">

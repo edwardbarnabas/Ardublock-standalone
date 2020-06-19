@@ -455,6 +455,7 @@ public class OpenblocksFrame extends JFrame
 		}
 		else
 		{
+			
 			this.loadFile();
 		}
 		this.setTitle(makeFrameTitle());
@@ -463,6 +464,9 @@ public class OpenblocksFrame extends JFrame
 	private void loadFile()
 	{
 		int result = fileChooser.showOpenDialog(this);
+		
+		System.out.println("Opening Ardublock File...");
+		
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			File savedFile = fileChooser.getSelectedFile();

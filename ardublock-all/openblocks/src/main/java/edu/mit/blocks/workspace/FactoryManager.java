@@ -397,10 +397,17 @@ public class FactoryManager implements WorkspaceWidget, ComponentListener, Works
      */
     public void addStaticDrawer(String name, int position, Color color) {
         if (isValidDrawer(true, false, name, position)) {
+        	
+        	System.out.println("adding a static drawer: " + name);
+
+        	
             FactoryCanvas canvas = new FactoryCanvas(name, color);
             this.staticCanvases.add(position, canvas);
             this.navigator.setCanvas(staticCanvases, STATIC_NAME);
         } else {
+        	
+        	System.out.println("Error adding a static drawer: " + name);
+        	
             this.printError("Invalid Drawer: trying to add a drawer that already exists: " + name);
         }
     }
@@ -450,10 +457,16 @@ public class FactoryManager implements WorkspaceWidget, ComponentListener, Works
      */
     public void addDynamicDrawer(String name, int position) {
         if (isValidDrawer(false, true, name, position)) {
+        	
+        	System.out.println("adding a dynamic drawer: " + name);
+        	
             FactoryCanvas canvas = new FactoryCanvas(name);
             this.dynamicCanvases.add(position, canvas);
             this.navigator.setCanvas(dynamicCanvases, DYNAMIC_NAME);
         } else {
+        	
+        	System.out.println("Error adding a dynamic drawer: " + name);
+        	
             this.printError("Invalid Drawer: trying to add a drawer that already exists: " + name);
         }
     }
