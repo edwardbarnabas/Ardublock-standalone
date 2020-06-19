@@ -1,6 +1,6 @@
 # Ardublock-Standalone
 
-![Screenshot](/images/ardublock_screenshot.jpg)
+![Screenshot](/images/ardublock_screenshot_20200619.jpg)
 
 This project is a branch from the original Ardublock project (link below) from @taweili.  We plan to use this with our robotics students, but it can be adapted to any Arduino-based platform.  Arduino must be install on a system for it it t work.  
 
@@ -19,6 +19,7 @@ Usage:
 - Arduino IDE needs to be installed but not running in order for the code to work since it runs using arduino_debug.exe
 
 Notes:
+- 20200619: Linux path added to support linux.  Updated GUI.  Allow user to select Barnabas project to dynamically change available blocks shown.
 - 20200614: Now works with Mac
 - 20200610: Only tested on 64-bit Windows.
 - 20200610: Took previous version of Ardublock and created a standalone version by making calls to arduino_debug.exe and JSerial.
