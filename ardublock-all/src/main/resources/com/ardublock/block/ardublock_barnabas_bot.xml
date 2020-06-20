@@ -82,6 +82,13 @@
 					<DefaultArg genus-name="number" label="1000" />
 				</BlockConnector>
 			</BlockConnectors>
+			
+			<Images>
+				<Image>
+					<FileLocation>com/ardublock/block/barnabasrobotic/ardublockIcon_delay_ms.png</FileLocation>
+				</Image>
+			</Images>
+			
 		</BlockGenus>
 		<BlockGenus name="if" kind="command" initlabel="bg.if" color="255 221 0">
 			<description>

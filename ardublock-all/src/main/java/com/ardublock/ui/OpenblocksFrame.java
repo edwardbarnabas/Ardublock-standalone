@@ -1,6 +1,7 @@
 package com.ardublock.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -31,6 +32,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -42,6 +44,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -263,6 +268,7 @@ public class OpenblocksFrame extends JFrame
 		JButton generateButton = new JButton(uiMessageBundle.getString("ardublock.ui.upload"));
 		generateButton.addActionListener(new GenerateCodeButtonListener(this, context));
 		
+		//generateButton.setBackground(Color.RED);
 		
 		JButton serialMonitorButton = new JButton(uiMessageBundle.getString("ardublock.ui.serialMonitor"));
 		serialMonitorButton.addActionListener(new ActionListener () {
@@ -407,6 +413,16 @@ public class OpenblocksFrame extends JFrame
 		jp5.add(generateButton);
 		jp5.add(serialMonitorButton);
 		jp5.setLayout(new GridLayout(2,1));
+		
+		Border border = BorderFactory.createLineBorder(Color.black);
+		Border margin = new EmptyBorder(10,10,10,10);
+		jp1.setBorder(new CompoundBorder(border, margin));
+		jp2.setBorder(new CompoundBorder(border, margin));
+		jp3.setBorder(new CompoundBorder(border, margin));
+		jp4.setBorder(new CompoundBorder(border, margin));
+		jp5.setBorder(new CompoundBorder(border, margin));
+		
+		
 		
 		
 		topPanel.add(jp1);

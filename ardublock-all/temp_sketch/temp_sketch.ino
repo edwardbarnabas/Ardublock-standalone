@@ -4,6 +4,7 @@ void setup()
 
 void loop()
 {
-  tone(6, 440);
+  delay( 1000 );
+  delay( 1000 );
 }
 
