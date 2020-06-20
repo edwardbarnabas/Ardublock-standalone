@@ -51,14 +51,20 @@ public class GenerateCodeButtonListener implements ActionListener
 	private Thread uploadThread;
 	private SerialUploadRunnable uploadRunnable;
 	private String upload_cmd;
+
 	private ArrayList<String> upload_cmd_list;
 	private String[] upload_cmd_array;
+
+	//private ArrayList<String> upload_cli_list;
+	//private String[] upload_cli_array;
 
 	private JTextArea textArea;
 	
 	//- upload file parameters
 	private String sketchfileDir;
 	private String sketchfilePath;
+	private String arduinoCliDir;
+	private String arduinoCliPath;
 
 	public GenerateCodeButtonListener(OpenblocksFrame oframe, Context context)
 	{
@@ -71,8 +77,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
 		upload_cmd = null;
-
 		upload_cmd_list = new ArrayList<String>();
+		//upload_cli_list = new ArrayList<String>();
 
 		uploadRunnable = new SerialUploadRunnable(parentFrame);
 		uploadThread = new Thread(uploadRunnable);
@@ -89,6 +95,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		//- create file path to the .ino that will be created later.
 		//- add quotes around file path in case there are whitespaces in the path
 		sketchfilePath = sketchfileDir + context.getSketchName();
+
 	}
 
 	public boolean generateC() {
@@ -310,6 +317,181 @@ public class GenerateCodeButtonListener implements ActionListener
 			textArea.setBackground(Color.red);	
 		}
 	}
+
+	private boolean runArduinoCli() {
+
+		String baud = null;
+		String avr_part = null;
+		String board = null;
+		String selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
+		String port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
+
+		upload_cmd_list.clear();
+		upload_cmd_list.add(context.getArduinoCliDir());
+
+		//- if Arduino cli is not there, error out.
+		arduinoCliDir = context.getArduinoCliDir();
+		File directory = new File(arduinoCliDir);
+		directory = new File(arduinoCliDir);
+		if(!directory.exists()) {
+			System.out.println("Cannot find Arduino-cli!");
+			textArea.append("\n Arduino-cli not installed!");
+			textArea.append("\n Cannot find file: " + arduinoCliDir);
+			textArea.setBackground(Color.red);
+			JOptionPane.showMessageDialog(parentFrame, "Arduino cli not installed!", "Error", JOptionPane.ERROR_MESSAGE);
+			System.out.println("Arduino cli not installed!");
+			return false;
+		}
+
+		//- Compile first
+		upload_cmd_list.add("compile");
+		upload_cmd_list.add("--fqbn");
+
+		if (selectedBoard=="Barnabas Noggin") {
+			baud = "57600";
+			board = "nano";
+			avr_part = "atmega328old";
+			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
+		}
+		else if (selectedBoard == "Arduino Uno") {
+			baud = "115200";
+			board = "uno";
+			upload_cmd_list.add("arduino:avr:" + board);
+		}
+
+		upload_cmd_list.add(context.getSketchPath(sketchfilePath));
+
+		//- run compile command first
+
+		//- display compile status
+		textArea.append("\nPort: " + port);
+		textArea.append("\nBaudRate: " + baud);
+		textArea.append("\nBoard: " + board);
+		textArea.append("\nAVR Part: " + avr_part);
+		textArea.append("\nSketch Name: " + sketchfilePath);
+		textArea.append("\nArduino Compile Command: " + upload_cmd_list.toString() +"\n");
+
+		upload_cmd_array = new String[upload_cmd_list.size()];
+		upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
+		Runtime rt = Runtime.getRuntime();
+		Process process;
+		try {
+			process = rt.exec(upload_cmd_array);
+
+			BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while ((line = input.readLine()) != null) {
+				System.out.println(line);
+			}
+			process.waitFor();
+			textArea.append("\nFinished compiling!\n");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		//- now prepare for upload
+		upload_cmd_list.clear();
+		upload_cmd_list.add(context.getArduinoCliDir());
+		upload_cmd_list.add("upload");
+		upload_cmd_list.add("-p");
+		upload_cmd_list.add(context.getPortString(port));
+		upload_cmd_list.add("--fqbn");
+
+		if (selectedBoard=="Barnabas Noggin") {
+			baud = "57600";
+			board = "nano";
+			avr_part = "atmega328old";
+			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
+		}
+		else if (selectedBoard == "Arduino Uno") {
+			baud = "115200";
+			board = "uno";
+			upload_cmd_list.add("arduino:avr:" + board);
+		}
+
+		upload_cmd_list.add(context.getSketchDir());
+		upload_cmd_list.add("--verbose");
+
+		textArea.append("\nArduino Upload Command: " + upload_cmd_list.toString() +"\n");
+
+		return true;
+		
+
+	}
+
+	private boolean runArduinoDebug() {
+
+		String baud = null;
+		String avr_part = null;
+		String board = null;
+		String selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
+		String port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
+
+		upload_cmd = context.getArduinoCmdLine();
+		upload_cmd_list.clear();
+		upload_cmd_list.add(context.getArduinoCmdLine());
+
+		//- check to see if arduino command line exists on system.  If not, throw an error
+		//- if Arduino file doesn't exit, abort and notify the user to install Arduino first.
+		File arduinoFile = new File(upload_cmd);
+		if (!arduinoFile.exists()) {
+			textArea.append("\n Arduino not installed!");
+			textArea.append("\n Cannot find file: " + upload_cmd);
+			textArea.setBackground(Color.red);
+			JOptionPane.showMessageDialog(parentFrame, "Arduino not installed!  To install, go to: https://www.arduino.cc/en/Main/Software", "Error", JOptionPane.ERROR_MESSAGE);
+			System.out.println("Arduino not installed!");
+			return false;
+		}
+
+		if (selectedBoard=="Barnabas Noggin") {
+			baud = "57600";
+			board = "nano";
+			avr_part = "atmega328old";
+
+			upload_cmd += " --board arduino:avr:" + board + ":cpu=" + avr_part;
+
+			upload_cmd_list.add("--board");
+			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
+		}
+		else if (selectedBoard == "Arduino Uno") {
+			baud = "115200";
+			board = "uno";
+
+			upload_cmd += " --board arduino:avr:" + board;
+
+			upload_cmd_list.add("--board");
+			upload_cmd_list.add("arduino:avr:" + board);
+		}
+
+		//- add "/dev" to port path if on linux or mac
+		port = context.getPortString(port);
+		
+		upload_cmd += " --port " + port;
+		upload_cmd_list.add("--port");
+		upload_cmd_list.add(port);
+		
+		//- add quotes to sketch file path to take care of white spaces (only for windows)
+		upload_cmd += " --upload " + context.getSketchPath(sketchfilePath);
+		upload_cmd_list.add("--upload");
+		upload_cmd_list.add(context.getSketchPath(sketchfilePath));
+		
+		upload_cmd += " --verbose";
+		upload_cmd_list.add("--verbose");
+
+		/*******************************/
+		/**** Display Upload Status ****/
+		/*******************************/
+		
+		textArea.append("\nPort: " + port);
+		textArea.append("\nBaudRate: " + baud);
+		textArea.append("\nBoard: " + board);
+		textArea.append("\nAVR Part: " + avr_part);
+		textArea.append("\nSketch Name: " + sketchfilePath);
+		textArea.append("\nArduino Command List: " + upload_cmd_list.toString() +"\n");
+
+		return true;
+		
+	}
 	
 	public void compileAndUpload() throws InterruptedException, ExecutionException
 	{
@@ -332,80 +514,7 @@ public class GenerateCodeButtonListener implements ActionListener
 			textArea.setBackground(Color.red);
 			return;
 		}
-		
-		String baud = null;
-		String avr_part = null;
-		String board = null;
-		String selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
-		
-		//- call to context object gets the arduino command line path for Mac, Windows or Linux
-		upload_cmd = context.getArduinoCmdLine();
-		upload_cmd_list.clear();
-		upload_cmd_list.add(context.getArduinoCmdLine());
-		
-		//- check to see if arduino command line exists on system.  If not, throw an error
-		
-		System.out.println(upload_cmd);
-		File arduinoFile = new File(upload_cmd);
-		
-		//- if Arduino file doesn't exit, abort and notify the user to install Arduino first.
-		if (!arduinoFile.exists()) {
-			textArea.append("\n Arduino not installed!");
-			textArea.append("\n Cannot find file: " + upload_cmd);
-			textArea.setBackground(Color.red);
-			JOptionPane.showMessageDialog(parentFrame, "Arduino not installed!  To install, go to: https://www.arduino.cc/en/Main/Software", "Error", JOptionPane.ERROR_MESSAGE);
-			System.out.println("Arduino not installed!");
-			return;
-		}
-		
 
-		if (selectedBoard=="Barnabas Noggin") {
-			baud = "57600";
-			board = "nano";
-			avr_part = "atmega328old";
-			upload_cmd += " --board arduino:avr:" + board + ":cpu=" + avr_part;
-
-			upload_cmd_list.add("--board");
-			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
-		}
-		else if (selectedBoard == "Arduino Uno") {
-			baud = "115200";
-			board = "uno";
-			upload_cmd += " --board arduino:avr:" + board;
-
-			upload_cmd_list.add("--board");
-			upload_cmd_list.add("arduino:avr:" + board);
-		}
-
-		//- add "/dev" to port path if on linux or mac
-		port = context.getPortString(port);
-		
-		upload_cmd += " --port " + port;
-		upload_cmd_list.add("--port");
-		upload_cmd_list.add(port);
-		
-		//- add quotes to sketch file path to take care of white spaces (only for windows)
-		upload_cmd += " --upload " + context.getSketchPath(sketchfilePath);
-		upload_cmd_list.add("--upload");
-		upload_cmd_list.add(context.getSketchPath(sketchfilePath));
-		
-		upload_cmd += " --verbose";
-		upload_cmd_list.add("--verbose");
-		
-		/*******************************/
-		/**** Display Upload Status ****/
-		/*******************************/
-		
-		textArea.append("\nPort: " + port);
-		textArea.append("\nBaudRate: " + baud);
-		textArea.append("\nBoard: " + board);
-		textArea.append("\nAVR Part: " + avr_part);
-		textArea.append("\nSketch Name: " + sketchfilePath);
-		
-		textArea.append("\nArduino Command String: " + upload_cmd +"\n");
-		textArea.append("\nArduino Command List: " + upload_cmd_list.toString() +"\n");
-	
-				        
         /* start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
          * 
@@ -416,29 +525,31 @@ public class GenerateCodeButtonListener implements ActionListener
         //- if there is an existing thread that is alive, then just toggle the run flag by calling doRun()        
 		
 		//- convert String list to String array
-		upload_cmd_array = new String[upload_cmd_list.size()];
-		upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
 
-		if (uploadThread.isAlive()) {
-        	System.out.println("uploadThread is alive!");
-			uploadRunnable.upload_cmd = upload_cmd;
-			uploadRunnable.upload_cmd_array = upload_cmd_array;
-        	uploadRunnable.doRun();
-        }
-        else {
-        	//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
-        	System.out.println("Starting upload thread...");
-        	
-        	uploadRunnable = new SerialUploadRunnable(parentFrame);
-			uploadRunnable.upload_cmd = upload_cmd;
-			uploadRunnable.upload_cmd_array = upload_cmd_array;
-        	
-        	uploadThread = new Thread(uploadRunnable);
-        	uploadThread.start(); 
-        }
-        
-        
+		if (runArduinoDebug()) {
+		//if (runArduinoCli()) {
+			upload_cmd_array = new String[upload_cmd_list.size()];
+			upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
 
+			if (uploadThread.isAlive()) {
+        		System.out.println("uploadThread is alive!");
+				uploadRunnable.upload_cmd = upload_cmd;
+				uploadRunnable.upload_cmd_array = upload_cmd_array;
+        		uploadRunnable.doRun();
+        	}
+        	else {
+        		//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
+        		System.out.println("Starting upload thread...");
+        	
+        		uploadRunnable = new SerialUploadRunnable(parentFrame);
+				uploadRunnable.upload_cmd = upload_cmd;
+				uploadRunnable.upload_cmd_array = upload_cmd_array;
+        	
+        		uploadThread = new Thread(uploadRunnable);
+        		uploadThread.start(); 
+        	}
+
+		}
 	}
 	
 	//- creates a .ino file with corresponding directory inside the executing folder of this .jar 

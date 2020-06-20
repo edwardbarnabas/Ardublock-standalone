@@ -122,6 +122,26 @@ public class Context
 		}
 	
 		return path;
+	}
+
+	public String getArduinoCliDir() {
+
+		String path = System.getProperty("user.dir");
+
+		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\arduino_cli\\win_64\\arduino-cli.exe";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			path += "/arduino_cli/mac/arduino-cli";
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			path += "/arduino_cli/linux_64/arduino-cli";
+		}
+		else {
+			path += "/arduino_cli/linux_64";
+		}
+	
+		return path;
 
 	}
 
