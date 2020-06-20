@@ -120,7 +120,8 @@ public class OpenblocksFrame extends JFrame
 		/* Construct main Ardublock window */
 		context = Context.getContext();
 		this.setTitle(makeFrameTitle());
-		this.setSize(new Dimension(1024, 760));
+		//this.setSize(new Dimension(1024, 760));
+		this.setSize(new Dimension(1200, 760));
 		this.setLayout(new BorderLayout());
 		this.setLocationRelativeTo(null);
 

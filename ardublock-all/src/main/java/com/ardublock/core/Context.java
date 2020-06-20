@@ -145,6 +145,25 @@ public class Context
 		return path;
 
 	}
+
+	//- add quotes around path for windows only
+	public String getSketchPath(String path) {
+
+		if (osType.equals(OsType.WINDOWS)) {
+			path = "\"" + path + "\"";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			//- do nothing
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			//- do nothing 
+		}
+		else {
+			//- do nothing
+		}
+	
+		return path;
+	}
 	
 	//- returns the arduino command line for uploading and compiling depending
 	//- on the OS

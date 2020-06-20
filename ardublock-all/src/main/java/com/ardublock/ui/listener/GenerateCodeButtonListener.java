@@ -371,9 +371,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		upload_cmd += " --port " + port;
 		
-		//- add quotes to sketch file path to take care of white spaces
-		upload_cmd += " --upload " + "\"" + sketchfilePath + "\"";
-		
+		//- add quotes to sketch file path to take care of white spaces (only for windows)
+		upload_cmd += " --upload " + context.getSketchPath(sketchfilePath);
 		
 		upload_cmd += " --verbose";
 		
