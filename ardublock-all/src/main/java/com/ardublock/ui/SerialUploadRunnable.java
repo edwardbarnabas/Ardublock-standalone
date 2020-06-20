@@ -10,6 +10,7 @@ public class SerialUploadRunnable implements Runnable {
 
 	private boolean doStop;
 	public String upload_cmd;
+	public String[] upload_cmd_array;
 	private JTextArea textArea;
 	private OpenblocksFrame parentFrame;
 	public boolean timed_out = false;
@@ -64,8 +65,9 @@ public class SerialUploadRunnable implements Runnable {
 		
 		//- setup process
 		Runtime rt = Runtime.getRuntime();
-		Process process = rt.exec(upload_cmd);
-		
+		//Process process = rt.exec(upload_cmd);
+		Process process = rt.exec(upload_cmd_array);
+
 		//- read feedback from process
 		BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		while ((line = input.readLine()) != null) {

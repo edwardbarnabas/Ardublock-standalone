@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -50,6 +51,9 @@ public class GenerateCodeButtonListener implements ActionListener
 	private Thread uploadThread;
 	private SerialUploadRunnable uploadRunnable;
 	private String upload_cmd;
+	private ArrayList<String> upload_cmd_list;
+	private String[] upload_cmd_array;
+
 	private JTextArea textArea;
 	
 	//- upload file parameters
@@ -67,7 +71,9 @@ public class GenerateCodeButtonListener implements ActionListener
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
 		upload_cmd = null;
-		
+
+		upload_cmd_list = new ArrayList<String>();
+
 		uploadRunnable = new SerialUploadRunnable(parentFrame);
 		uploadThread = new Thread(uploadRunnable);
 		
@@ -82,9 +88,6 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		//- create file path to the .ino that will be created later.
 		//- add quotes around file path in case there are whitespaces in the path
-		
-		//sketchfilePath = "\"" + sketchfileDir + context.getSketchName() + "\"";
-		
 		sketchfilePath = sketchfileDir + context.getSketchName();
 	}
 
@@ -337,6 +340,8 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		//- call to context object gets the arduino command line path for Mac, Windows or Linux
 		upload_cmd = context.getArduinoCmdLine();
+		upload_cmd_list.clear();
+		upload_cmd_list.add(context.getArduinoCmdLine());
 		
 		//- check to see if arduino command line exists on system.  If not, throw an error
 		
@@ -359,22 +364,33 @@ public class GenerateCodeButtonListener implements ActionListener
 			board = "nano";
 			avr_part = "atmega328old";
 			upload_cmd += " --board arduino:avr:" + board + ":cpu=" + avr_part;
+
+			upload_cmd_list.add("--board");
+			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
 		}
 		else if (selectedBoard == "Arduino Uno") {
 			baud = "115200";
 			board = "uno";
 			upload_cmd += " --board arduino:avr:" + board;
+
+			upload_cmd_list.add("--board");
+			upload_cmd_list.add("arduino:avr:" + board);
 		}
 
 		//- add "/dev" to port path if on linux or mac
 		port = context.getPortString(port);
 		
 		upload_cmd += " --port " + port;
+		upload_cmd_list.add("--port");
+		upload_cmd_list.add(port);
 		
 		//- add quotes to sketch file path to take care of white spaces (only for windows)
 		upload_cmd += " --upload " + context.getSketchPath(sketchfilePath);
+		upload_cmd_list.add("--upload");
+		upload_cmd_list.add(context.getSketchPath(sketchfilePath));
 		
 		upload_cmd += " --verbose";
+		upload_cmd_list.add("--verbose");
 		
 		/*******************************/
 		/**** Display Upload Status ****/
@@ -386,7 +402,9 @@ public class GenerateCodeButtonListener implements ActionListener
 		textArea.append("\nAVR Part: " + avr_part);
 		textArea.append("\nSketch Name: " + sketchfilePath);
 		
-		textArea.append("\nArduino Command: " + upload_cmd +"\n");
+		textArea.append("\nArduino Command String: " + upload_cmd +"\n");
+		textArea.append("\nArduino Command List: " + upload_cmd_list.toString() +"\n");
+	
 				        
         /* start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
@@ -396,9 +414,15 @@ public class GenerateCodeButtonListener implements ActionListener
          */
         
         //- if there is an existing thread that is alive, then just toggle the run flag by calling doRun()        
-        if (uploadThread.isAlive()) {
+		
+		//- convert String list to String array
+		upload_cmd_array = new String[upload_cmd_list.size()];
+		upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
+
+		if (uploadThread.isAlive()) {
         	System.out.println("uploadThread is alive!");
-        	uploadRunnable.upload_cmd = upload_cmd;
+			uploadRunnable.upload_cmd = upload_cmd;
+			uploadRunnable.upload_cmd_array = upload_cmd_array;
         	uploadRunnable.doRun();
         }
         else {
@@ -406,7 +430,8 @@ public class GenerateCodeButtonListener implements ActionListener
         	System.out.println("Starting upload thread...");
         	
         	uploadRunnable = new SerialUploadRunnable(parentFrame);
-        	uploadRunnable.upload_cmd = upload_cmd;
+			uploadRunnable.upload_cmd = upload_cmd;
+			uploadRunnable.upload_cmd_array = upload_cmd_array;
         	
         	uploadThread = new Thread(uploadRunnable);
         	uploadThread.start(); 
