@@ -364,7 +364,7 @@ public class GenerateCodeButtonListener implements ActionListener
 			System.out.println("Arduino cli not installed!");
 			return false;
 		}
-		
+	
 		//- Compile
 		upload_cmd_array = build_arduino_cli_compile_cmd();
 		

@@ -170,6 +170,12 @@ public class OpenblocksFrame extends JFrame
 		BufferedReader input;
 		String line;
 		
+		uploadTextArea.append("Sending command:");
+		for (String str : strArray) {
+			uploadTextArea.append(" " + str);
+		}
+		uploadTextArea.append("\n");
+		
 		process = rt.exec(strArray);
 		input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		while ((line = input.readLine()) != null) {

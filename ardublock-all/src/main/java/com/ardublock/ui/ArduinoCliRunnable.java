@@ -94,6 +94,25 @@ public class ArduinoCliRunnable implements Runnable {
 		return cmd_array;
 	}
 	
+	public String[] build_install_servolib_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+		cmd_list.add(parentFrame.context.getArduinoCliDir());
+		cmd_list.add("lib");
+		cmd_list.add("install");
+		cmd_list.add("servo");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
+	
+	
+	
 	private void runArduinoCli() throws InterruptedException, IOException, RuntimeException {
 		
 		//- Initialize variables
@@ -102,6 +121,7 @@ public class ArduinoCliRunnable implements Runnable {
 		String[] cmd;
 		
 		OpenblocksFrame.runCommandLine(build_board_index_cli_cmd());
+		OpenblocksFrame.runCommandLine(build_install_servolib_cmd());
 
 		//- get arduino boards
 		cmd = build_core_arduino_boards_cli_cmd();
