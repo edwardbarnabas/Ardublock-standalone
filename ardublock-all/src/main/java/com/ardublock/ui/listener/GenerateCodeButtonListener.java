@@ -30,6 +30,7 @@ import com.ardublock.translator.block.exception.BlockException;
 import com.ardublock.translator.block.exception.SocketNullException;
 import com.ardublock.translator.block.exception.SubroutineNameDuplicatedException;
 import com.ardublock.translator.block.exception.SubroutineNotDeclaredException;
+import com.ardublock.ui.CompileRunnable;
 import com.ardublock.ui.OpenblocksFrame;
 import com.ardublock.ui.SerialUploadRunnable;
 
@@ -43,45 +44,51 @@ public class GenerateCodeButtonListener implements ActionListener
 	//private JFrame parentFrame;
 	private OpenblocksFrame parentFrame;
 	
-	
 	private Context context;
 	private Workspace workspace; 
 	private ResourceBundle uiMessageBundle;
 	
 	private Thread uploadThread;
 	private SerialUploadRunnable uploadRunnable;
+	private Thread compileThread;
+	private CompileRunnable compileRunnable;
+
 	private String upload_cmd;
 
 	private ArrayList<String> upload_cmd_list;
 	private String[] upload_cmd_array;
-
-	//private ArrayList<String> upload_cli_list;
-	//private String[] upload_cli_array;
 
 	private JTextArea textArea;
 	
 	//- upload file parameters
 	private String sketchfileDir;
 	private String sketchfilePath;
-	private String arduinoCliDir;
 	private String arduinoCliPath;
+	
+	private String baud;
+	private String avr_part;
+	private String board;
+	private String board_string;
+	private String selectedBoard;
+	private String port;
 
 	public GenerateCodeButtonListener(OpenblocksFrame oframe, Context context)
 	{
 		this.parentFrame = oframe;
 		this.context = context;
-		
 		this.textArea = oframe.uploadTextArea;
 		
 		workspace = context.getWorkspaceController().getWorkspace();
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
 		upload_cmd = null;
+		
 		upload_cmd_list = new ArrayList<String>();
-		//upload_cli_list = new ArrayList<String>();
 
 		uploadRunnable = new SerialUploadRunnable(parentFrame);
 		uploadThread = new Thread(uploadRunnable);
+		compileRunnable = new CompileRunnable(parentFrame,this);
+		compileThread = new Thread(compileRunnable);
 		
 		//-create temp_sketch directory in the executing folder of this .jar
 		sketchfileDir = context.getSketchDir();
@@ -296,13 +303,31 @@ public class GenerateCodeButtonListener implements ActionListener
 	
 	public void actionPerformed(ActionEvent e)
 	{
+		
+		//- upload button has been set.  Set upload/compile settings based on port and board.
+		selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
+		port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
+		
+		if (selectedBoard=="Barnabas Noggin") {
+			baud = "57600";
+			board = "nano";
+			avr_part = "atmega328old";
+			board_string = "arduino:avr:" + board + ":cpu=" + avr_part;
+		}
+		else if (selectedBoard == "Arduino Uno") {
+			baud = "115200";
+			board = "uno";
+			avr_part = null;
+			board_string = "arduino:avr:" + board;
+		}
+		
 		textArea.setBackground(Color.white);
 		textArea.setText("");
-		textArea.append("\nGenerating Blocks...\n");
+		textArea.append("Generating Blocks...");
 		
 		if(generateC()) {
 			try {
-				textArea.append("\nBlocks successfully converted to C Code!\n");
+				textArea.append("Success!");
 				compileAndUpload();
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -313,110 +338,94 @@ public class GenerateCodeButtonListener implements ActionListener
 			}
 		}
 		else {
-			textArea.append("\nBlock generation error!\n");
+			textArea.append("Block generation error!");
 			textArea.setBackground(Color.red);	
 		}
 	}
 
-	private boolean runArduinoCli() {
+	private boolean runArduinoCli() throws InterruptedException, RuntimeException {
 
-		String baud = null;
-		String avr_part = null;
-		String board = null;
-		String selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();
-		String port = (String) parentFrame.portOptionsComboBox.getSelectedItem();
-
-		upload_cmd_list.clear();
-		upload_cmd_list.add(context.getArduinoCliDir());
-
-		//- if Arduino cli is not there, error out.
-		arduinoCliDir = context.getArduinoCliDir();
-		File directory = new File(arduinoCliDir);
-		directory = new File(arduinoCliDir);
+		//- print status to console
+		textArea.append("\n\nStarting compile/upload process...");
+		textArea.append("\nSettings - Port: " + port);
+		textArea.append(", BaudRate: " + baud);
+		textArea.append(", Board: " + board);
+		textArea.append(", AVR Part: " + avr_part);
+		textArea.append("\nTemporary Sketch Path: " + sketchfilePath);
+		
+		//- if arduino-cli is not there, error out.
+		File directory = new File(context.getArduinoCliDir());
 		if(!directory.exists()) {
-			System.out.println("Cannot find Arduino-cli!");
+			System.out.println("\nCannot find Arduino-cli!");
 			textArea.append("\n Arduino-cli not installed!");
-			textArea.append("\n Cannot find file: " + arduinoCliDir);
+			textArea.append("\n Cannot find file: " + context.getArduinoCliDir());
 			textArea.setBackground(Color.red);
 			JOptionPane.showMessageDialog(parentFrame, "Arduino cli not installed!", "Error", JOptionPane.ERROR_MESSAGE);
 			System.out.println("Arduino cli not installed!");
 			return false;
 		}
-
-		//- Compile first
-		upload_cmd_list.add("compile");
-		upload_cmd_list.add("--fqbn");
-
-		if (selectedBoard=="Barnabas Noggin") {
-			baud = "57600";
-			board = "nano";
-			avr_part = "atmega328old";
-			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
-		}
-		else if (selectedBoard == "Arduino Uno") {
-			baud = "115200";
-			board = "uno";
-			upload_cmd_list.add("arduino:avr:" + board);
-		}
-
-		upload_cmd_list.add(context.getSketchPath(sketchfilePath));
-
-		//- run compile command first
-
-		//- display compile status
-		textArea.append("\nPort: " + port);
-		textArea.append("\nBaudRate: " + baud);
-		textArea.append("\nBoard: " + board);
-		textArea.append("\nAVR Part: " + avr_part);
-		textArea.append("\nSketch Name: " + sketchfilePath);
-		textArea.append("\nArduino Compile Command: " + upload_cmd_list.toString() +"\n");
-
-		upload_cmd_array = new String[upload_cmd_list.size()];
-		upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
-		Runtime rt = Runtime.getRuntime();
-		Process process;
-		try {
-			process = rt.exec(upload_cmd_array);
-
-			BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line;
-			while ((line = input.readLine()) != null) {
-				System.out.println(line);
-			}
-			process.waitFor();
-			textArea.append("\nFinished compiling!\n");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		//- now prepare for upload
-		upload_cmd_list.clear();
-		upload_cmd_list.add(context.getArduinoCliDir());
-		upload_cmd_list.add("upload");
-		upload_cmd_list.add("-p");
-		upload_cmd_list.add(context.getPortString(port));
-		upload_cmd_list.add("--fqbn");
-
-		if (selectedBoard=="Barnabas Noggin") {
-			baud = "57600";
-			board = "nano";
-			avr_part = "atmega328old";
-			upload_cmd_list.add("arduino:avr:" + board + ":cpu=" + avr_part);
-		}
-		else if (selectedBoard == "Arduino Uno") {
-			baud = "115200";
-			board = "uno";
-			upload_cmd_list.add("arduino:avr:" + board);
-		}
-
-		upload_cmd_list.add(context.getSketchDir());
-		upload_cmd_list.add("--verbose");
-
-		textArea.append("\nArduino Upload Command: " + upload_cmd_list.toString() +"\n");
-
-		return true;
 		
-
+		//- Compile
+		upload_cmd_array = build_arduino_cli_compile_cmd();
+		
+		if (compileThread.isAlive()) {
+    		System.out.println("uploadThread is alive!");
+			compileRunnable.upload_cmd_array = upload_cmd_array;
+			compileRunnable.doRun();
+    	}
+    	else {
+    		//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
+    		System.out.println("Starting compile thread...");
+    	
+    		compileRunnable = new CompileRunnable (parentFrame,this);
+    		compileRunnable.upload_cmd_array = upload_cmd_array;
+    	
+			compileThread = new Thread(compileRunnable);
+			compileThread.start(); 
+    	}	
+		return false;
+	}
+	
+	
+	public String[] build_arduino_cli_compile_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+		cmd_list.add(context.getArduinoCliDir());
+		cmd_list.add("compile");
+		cmd_list.add("--fqbn");
+		cmd_list.add(board_string);
+		cmd_list.add(context.getSketchPath(context.getSketchDir()));
+		cmd_list.add("--verbose");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
+	
+	public String[] build_arduino_cli_upload_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		//- now prepare for upload
+		cmd_list.clear();
+		cmd_list.add(context.getArduinoCliDir());
+		cmd_list.add("upload");
+		cmd_list.add("-p");
+		cmd_list.add(context.getPortString(port));
+		cmd_list.add("--fqbn");
+		cmd_list.add(board_string);
+		cmd_list.add(context.getSketchDir());
+		cmd_list.add("--verbose");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
 	}
 
 	private boolean runArduinoDebug() {
@@ -514,26 +523,25 @@ public class GenerateCodeButtonListener implements ActionListener
 			textArea.setBackground(Color.red);
 			return;
 		}
+		
+		runArduinoCli();
 
-        /* start thread here.  It will stop when the user clicks on the X 
+		/**
+		 * code block to run arduino_debug.exe option
+		 * 
+		 * start thread here.  It will stop when the user clicks on the X 
          * of the serial monitor window.
          * 
          * If the thread has been started and stopped before, just call doRun(), 
          * otherwise, start the thread since it has never been run before.
-         */
-        
-        //- if there is an existing thread that is alive, then just toggle the run flag by calling doRun()        
-		
-		//- convert String list to String array
-
+         * 
 		if (runArduinoDebug()) {
-		//if (runArduinoCli()) {
 			upload_cmd_array = new String[upload_cmd_list.size()];
 			upload_cmd_array = upload_cmd_list.toArray(upload_cmd_array);
 
+			//- if there is an existing thread that is alive, then just toggle the run flag by calling doRun() 
 			if (uploadThread.isAlive()) {
         		System.out.println("uploadThread is alive!");
-				uploadRunnable.upload_cmd = upload_cmd;
 				uploadRunnable.upload_cmd_array = upload_cmd_array;
         		uploadRunnable.doRun();
         	}
@@ -542,14 +550,12 @@ public class GenerateCodeButtonListener implements ActionListener
         		System.out.println("Starting upload thread...");
         	
         		uploadRunnable = new SerialUploadRunnable(parentFrame);
-				uploadRunnable.upload_cmd = upload_cmd;
 				uploadRunnable.upload_cmd_array = upload_cmd_array;
         	
         		uploadThread = new Thread(uploadRunnable);
         		uploadThread.start(); 
         	}
-
-		}
+		}*/
 	}
 	
 	//- creates a .ino file with corresponding directory inside the executing folder of this .jar 

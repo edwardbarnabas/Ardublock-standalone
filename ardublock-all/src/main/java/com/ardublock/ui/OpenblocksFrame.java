@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -69,10 +70,13 @@ public class OpenblocksFrame extends JFrame
 
 	private static final long serialVersionUID = 2841155965906223806L;
 	
-	private Context context;
+	public Context context;
 	
 	private JFileChooser fileChooser;
 	private FileFilter ffilter;
+	
+	private Thread cliThread;
+	private ArduinoCliRunnable cliRunnable;
 	
 	
 	//- Serial Monitor 
@@ -92,17 +96,13 @@ public class OpenblocksFrame extends JFrame
 
 	//- Serial Port Upload
 	public JScrollPane uploadScrollPane;
-	public JTextArea uploadTextArea;
+	static public JTextArea uploadTextArea = new JTextArea();
 	
-	//- Porgram Options
+	//- Program Options
 	public JComboBox programComboBox;
 	
-	
 	private ResourceBundle uiMessageBundle;
-	
-	
 	public JComboBox<String> boardOptionsComboBox;
-	
 	
 	public void addListener(OpenblocksFrameListener ofl)
 	{
@@ -147,18 +147,38 @@ public class OpenblocksFrame extends JFrame
 		sm_Runnable = new SerialMonitorRunnable(this);
 	    serialMonitorThread = new Thread(sm_Runnable);
 	    
-	    /* Serial Upload Objects */
-  		uploadTextArea = new JTextArea();
+	    /* Upload Objects */
   		uploadTextArea.setEditable(false);
   		uploadTextArea.setLineWrap(true);
   		uploadTextArea.setWrapStyleWord(true);
   		uploadTextArea.setMargin(new Insets(5, 5, 5, 5));
 		
   		uploadScrollPane = new JScrollPane(uploadTextArea);
-  		uploadScrollPane.setPreferredSize(new Dimension(600,75));
+  		uploadScrollPane.setPreferredSize(new Dimension(850,75));
+  		
+  		cliRunnable = new ArduinoCliRunnable(this);
+		cliThread = new Thread(cliRunnable);
 	  
 		initOpenBlocks();
 	  
+	}
+	
+	static public void runCommandLine(String[] strArray) throws InterruptedException, IOException {
+		
+		Runtime rt = Runtime.getRuntime();
+		Process process;
+		BufferedReader input;
+		String line;
+		
+		process = rt.exec(strArray);
+		input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		while ((line = input.readLine()) != null) {
+				System.out.println(line);
+				uploadTextArea.append(line + "\n");
+		}
+		process.waitFor();
+		uploadTextArea.append("Done!\n");
+		System.out.println("Done running command line!");
 	}
 	
 	public void updateAvailablePorts() {
@@ -237,6 +257,22 @@ public class OpenblocksFrame extends JFrame
 			//System.out.println("Device is still here!");
 		}
 	
+	}
+	
+	private void processUpdateThread() {
+		if (cliThread.isAlive()) {
+    		System.out.println("uploadThread is alive!");
+			cliRunnable.doRun();
+    	}
+    	else {
+    		//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
+    		System.out.println("Starting compile thread...");
+    	
+    		cliRunnable = new ArduinoCliRunnable(this);
+    		
+			cliThread = new Thread(cliRunnable);
+			cliThread.start(); 
+    	}	
 	}
 	
 	private void initOpenBlocks()
@@ -382,11 +418,23 @@ public class OpenblocksFrame extends JFrame
 			}
 		});
 		
+		JButton updateSoftware = new JButton("Update Software");
+		
+		updateSoftware.addActionListener(new ActionListener () {
+			
+			public void actionPerformed(ActionEvent e) {
+				uploadTextArea.setText("");
+				uploadTextArea.setBackground(Color.white);
+				processUpdateThread();
+			}
+		});
+		
 		JPanel jp1 = new JPanel();
 		JPanel jp2 = new JPanel();
 		JPanel jp3 = new JPanel();
 		JPanel jp4 = new JPanel();
 		JPanel jp5 = new JPanel();
+		
 		
 		jp1.add(newButton);
 		jp1.add(saveButton);
@@ -422,9 +470,6 @@ public class OpenblocksFrame extends JFrame
 		jp4.setBorder(new CompoundBorder(border, margin));
 		jp5.setBorder(new CompoundBorder(border, margin));
 		
-		
-		
-		
 		topPanel.add(jp1);
 		topPanel.add(jp2);
 		topPanel.add(jp3);
@@ -435,12 +480,18 @@ public class OpenblocksFrame extends JFrame
 		/**** Generate Bottom Panel Of The Window ****/
 		/*********************************************/
 		
-		JPanel bottomPanel = new JPanel();
-		JLabel versionLabel = new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version"));
+		JPanel jp6 = new JPanel();
+		jp6.add(updateSoftware);
+		jp6.add(new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version")));
+		jp6.setLayout(new GridLayout(2,1));
+		jp6.setBorder(new CompoundBorder(border, margin));
 		
-		bottomPanel.add(new JLabel("Upload Status: "));
+		
+		JPanel bottomPanel = new JPanel();
+
+		bottomPanel.add(new JLabel("Log: "));
 		bottomPanel.add(uploadScrollPane);
-		bottomPanel.add(versionLabel);
+		bottomPanel.add(jp6);
 		 
 
 		/***** Position Items On Window ******/
@@ -451,6 +502,8 @@ public class OpenblocksFrame extends JFrame
 		this.add(workspace, BorderLayout.CENTER);
 		
 	}
+	
+	
 	
 	public void doOpenArduBlockFile()
 	{
