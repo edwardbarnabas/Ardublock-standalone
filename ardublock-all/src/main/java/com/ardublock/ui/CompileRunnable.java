@@ -48,10 +48,9 @@ public class CompileRunnable implements Runnable {
 		while (true) {
 			if (keepRunning()) {
 				try {
-					//-do the compile first
-					runCompileProcess_arduino_cli();
 					
-					
+					//-do the compile first.  If there was an error, skip the uploading
+					if(!runCompileProcess_arduino_cli()) continue;
 					
 					//-when we are finished compiling, start the upload process
 					upload_cmd_array = listener.build_arduino_cli_upload_cmd();
@@ -86,12 +85,13 @@ public class CompileRunnable implements Runnable {
 	
 	
 	
-	private void runCompileProcess_arduino_cli() throws InterruptedException, IOException, RuntimeException {
+	private boolean runCompileProcess_arduino_cli() throws InterruptedException, IOException, RuntimeException {
 		
 		//- Initialize variables
 		String line = null;
 		int exitStatus = -1;
 		boolean startedLibraries = false;
+		boolean ret;
 		
 		textArea.append("\nCompiling with arduino_cli command: ");
 		for (String str : upload_cmd_array) {
@@ -163,12 +163,16 @@ public class CompileRunnable implements Runnable {
 		switch(exitStatus) {
 		  case 0:
 			textArea.append("\nCompiled Successfully!\n");
+			ret = true;
 		    break;
 		  case 1:
-			textArea.append("\nPlatform not installed.  Click Update Software.  Make sure that you're connected to the internet!");
+			textArea.append("\nCompile Error! Update Software.  Make sure that you're connected to the internet before doing so!");
+			textArea.setBackground(Color.red);
+			ret = false;
 		  default:
 			textArea.append("\nCompile Failed! Unknown Error code: " + exitStatus + "\n");
 			textArea.setBackground(Color.red);
+			ret = false;
 			break;
 		}
 		
@@ -176,6 +180,8 @@ public class CompileRunnable implements Runnable {
 
 		//- go to last line of the textArea
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
+		
+		return ret;
 		
 	}
 
