@@ -163,28 +163,34 @@ public class OpenblocksFrame extends JFrame
 	  
 	}
 	
-	static public void runCommandLine(String[] strArray) throws InterruptedException, IOException {
+	static public int runCommandLine(String[] strArray) throws InterruptedException, IOException {
 		
 		Runtime rt = Runtime.getRuntime();
 		Process process;
 		BufferedReader input;
 		String line;
+		int ret;
 		
 		uploadTextArea.append("Sending command:");
 		for (String str : strArray) {
 			uploadTextArea.append(" " + str);
 		}
-		uploadTextArea.append("\n");
 		
 		process = rt.exec(strArray);
 		input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		while ((line = input.readLine()) != null) {
 				System.out.println(line);
 				uploadTextArea.append(line + "\n");
+				//- go to last line of the textArea
+				uploadTextArea.setCaretPosition(uploadTextArea.getDocument().getLength());
 		}
 		process.waitFor();
-		uploadTextArea.append("Done!\n");
-		System.out.println("Done running command line!");
+		ret = process.exitValue();
+		uploadTextArea.append("Done processing. Return value = " + ret + "\n");
+		System.out.println("Done running command line!" + "Exit Status: " + ret);
+		
+		return ret;
+
 	}
 	
 	public void updateAvailablePorts() {

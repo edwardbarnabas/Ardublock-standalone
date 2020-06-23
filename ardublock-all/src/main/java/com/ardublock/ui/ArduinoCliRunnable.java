@@ -120,19 +120,38 @@ public class ArduinoCliRunnable implements Runnable {
 		int exitStatus = -1;
 		String[] cmd;
 		
-		OpenblocksFrame.runCommandLine(build_board_index_cli_cmd());
-		OpenblocksFrame.runCommandLine(build_install_servolib_cmd());
+		exitStatus = OpenblocksFrame.runCommandLine(build_board_index_cli_cmd());
+		textArea.append("\n");
+		
+		if (exitStatus != 0) {
+			textArea.append("Error updating board index.  Make sure that your computer is connected to the internet and try again!\n");
+			textArea.setBackground(Color.red);
+			textArea.setCaretPosition(textArea.getDocument().getLength());	
+			this.doStop = true;
+			return;
+		}
+		
+		exitStatus = OpenblocksFrame.runCommandLine(build_install_servolib_cmd());
+		
+		if (exitStatus != 0) {
+			textArea.append("Error installing servo library.  Make sure that your computer is connected to the internet and try again!\n");
+			textArea.setBackground(Color.red);
+			textArea.setCaretPosition(textArea.getDocument().getLength());	
+			this.doStop = true;
+			return;
+		}
+		
+		textArea.append("\n");
 
 		//- get arduino boards
 		cmd = build_core_arduino_boards_cli_cmd();
 		Runtime rt = Runtime.getRuntime();
 		Process process = rt.exec(cmd);
-		textArea.append("Sending update command: "); 
+		textArea.append("Sending command: "); 
 		for (String str : cmd) {
 			textArea.append(str + " ");
 		}
 		textArea.append("\n");
-		
 		
 		//- read feedback from process//- read feedback from process
 		BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -143,14 +162,23 @@ public class ArduinoCliRunnable implements Runnable {
 		        throw new RuntimeException(); 
 		    }
 			textArea.append(line + "\n");
+			textArea.setCaretPosition(textArea.getDocument().getLength());	
 			System.out.println(line);
 		}
 		process.waitFor();
 		
-		this.doStop = true;
-
-		//- go to last line of the textArea
+		if (exitStatus != 0) {
+			textArea.append("Error installing arduino core.  Make sure that your computer is connected to the internet and try again!");
+			textArea.setBackground(Color.red);
+		}
+		else {
+			textArea.append("Software successfully updated!");
+			textArea.setBackground(Color.green);
+		}
+		
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
+		this.doStop = true;
+		return;
 		
 	}
 
