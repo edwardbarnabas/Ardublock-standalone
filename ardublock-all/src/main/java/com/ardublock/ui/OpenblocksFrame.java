@@ -78,6 +78,8 @@ public class OpenblocksFrame extends JFrame
 	private Thread cliThread;
 	private ArduinoCliRunnable cliRunnable;
 	
+	private Thread driverThread;
+	private DriverRunnable driverRunnable;
 	
 	//- Serial Monitor 
 	public  JFrame serialMonitorframe;
@@ -158,12 +160,15 @@ public class OpenblocksFrame extends JFrame
   		
   		cliRunnable = new ArduinoCliRunnable(this);
 		cliThread = new Thread(cliRunnable);
+		
+		driverRunnable = new DriverRunnable(this);
+		driverThread = new Thread(driverRunnable);
 	  
 		initOpenBlocks();
 	  
 	}
 	
-	static public int runCommandLine(String[] strArray) throws InterruptedException, IOException {
+	static public int runCommandLineSpecificDir(String[] strArray, File dir) throws InterruptedException, IOException {
 		
 		Runtime rt = Runtime.getRuntime();
 		Process process;
@@ -176,20 +181,72 @@ public class OpenblocksFrame extends JFrame
 			uploadTextArea.append(" " + str);
 		}
 		
-		process = rt.exec(strArray);
-		input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		while ((line = input.readLine()) != null) {
-				System.out.println(line);
-				uploadTextArea.append(line + "\n");
-				//- go to last line of the textArea
-				uploadTextArea.setCaretPosition(uploadTextArea.getDocument().getLength());
+		try {
+			process = rt.exec(strArray,null,dir);
+			input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = input.readLine()) != null) {
+					System.out.println(line);
+					uploadTextArea.append(line + "\n");
+					//- go to last line of the textArea
+					uploadTextArea.setCaretPosition(uploadTextArea.getDocument().getLength());
+			}
+			process.waitFor();
+			ret = process.exitValue();
+			uploadTextArea.append("Done processing. Return value = " + ret + "\n");
+			System.out.println("Done running command line!" + "Exit Status: " + ret);
+			return ret;
 		}
-		process.waitFor();
-		ret = process.exitValue();
-		uploadTextArea.append("Done processing. Return value = " + ret + "\n");
-		System.out.println("Done running command line!" + "Exit Status: " + ret);
+		catch (IOException e) {
+			e.printStackTrace();
+			return -2;
+			
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			return -3;
+		}
+	}
+	
+	static public int runCommandLine(String[] strArray) {
 		
-		return ret;
+		Runtime rt = Runtime.getRuntime();
+		Process process;
+		BufferedReader input;
+		String line;
+		int ret;
+		
+		uploadTextArea.append("Sending command:");
+		for (String str : strArray) {
+			uploadTextArea.append(" " + str);
+		}
+		
+		try {
+			process = rt.exec(strArray);
+			input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = input.readLine()) != null) {
+					System.out.println(line);
+					uploadTextArea.append(line + "\n");
+					//- go to last line of the textArea
+					uploadTextArea.setCaretPosition(uploadTextArea.getDocument().getLength());
+			}
+			process.waitFor();
+			ret = process.exitValue();
+			uploadTextArea.append("Done processing. Return value = " + ret + "\n");
+			System.out.println("Done running command line!" + "Exit Status: " + ret);
+			return ret;
+
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return -2;
+			
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			return -3;
+		}
+		
+		
 
 	}
 	
@@ -269,6 +326,22 @@ public class OpenblocksFrame extends JFrame
 			//System.out.println("Device is still here!");
 		}
 	
+	}
+	
+	private void processDriverThread() {
+		if (driverThread.isAlive()) {
+    		System.out.println("driverThread is alive!");
+			driverRunnable.doRun();
+    	}
+    	else {
+    		//- the current uploadThread is not alive, or not running, so create a new runnable and thread and start it
+    		System.out.println("Starting driver upload thread...");
+    	
+    		driverRunnable = new DriverRunnable(this);
+    		
+			driverThread = new Thread(driverRunnable);
+			driverThread.start(); 
+    	}	
 	}
 	
 	private void processUpdateThread() {
@@ -441,6 +514,17 @@ public class OpenblocksFrame extends JFrame
 			}
 		});
 		
+		JButton updateDriver = new JButton("Update Device Driver");
+		
+		updateDriver.addActionListener(new ActionListener () {
+			
+			public void actionPerformed(ActionEvent e) {
+				uploadTextArea.setText("");
+				uploadTextArea.setBackground(Color.white);
+				processDriverThread();
+			}
+		});
+		
 		JPanel jp1 = new JPanel();
 		JPanel jp2 = new JPanel();
 		JPanel jp3 = new JPanel();
@@ -494,8 +578,9 @@ public class OpenblocksFrame extends JFrame
 		
 		JPanel jp6 = new JPanel();
 		jp6.add(updateSoftware);
+		jp6.add(updateDriver);
 		jp6.add(new JLabel("Version: " + uiMessageBundle.getString("ardublock.ui.version")));
-		jp6.setLayout(new GridLayout(2,1));
+		jp6.setLayout(new GridLayout(3,1));
 		jp6.setBorder(new CompoundBorder(border, margin));
 		
 		

@@ -123,6 +123,59 @@ public class Context
 	
 		return path;
 	}
+	
+	public String getCH341Dir() {
+
+		String path = System.getProperty("user.dir");
+
+		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\CH341\\CH341SER_win";
+		}
+		else if (osType.equals(OsType.MAC)) {
+			path += "/CH341/CH341SER_mac";
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			path += "/CH341/CH341SER_linux";
+		}
+		else {
+			path += "/CH341/CH341SER_linux";
+		}
+	
+		return path;
+
+	}
+	
+	
+	public String[] buildCH341Command() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+		
+		String path = getCH341Dir();
+		
+		if (osType.equals(OsType.WINDOWS)) {
+			cmd_list.add(path + "\\ch341_install_win.bat");
+		}
+		else if (osType.equals(OsType.MAC)) {
+			cmd_list.add(path + "\\ch341_install_mac.sh");
+		}
+		else if (osType.equals(OsType.LINUX)) {
+			//- do nothing
+		}
+		else {
+			//- do nothing
+		}
+	
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
+	
+	
+
 
 	public String getArduinoCliDir() {
 

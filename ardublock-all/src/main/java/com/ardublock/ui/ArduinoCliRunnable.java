@@ -124,7 +124,13 @@ public class ArduinoCliRunnable implements Runnable {
 		textArea.append("\n");
 		
 		if (exitStatus != 0) {
-			textArea.append("Error updating board index.  Make sure that your computer is connected to the internet and try again!\n");
+			
+			if (exitStatus == -2) {
+				textArea.append("Check to make sure that the arduino-cli folder exists!\n");	
+			}
+			else {
+				textArea.append("Error updating board index.  Make sure that your computer is connected to the internet and try again!\n");
+			}
 			textArea.setBackground(Color.red);
 			textArea.setCaretPosition(textArea.getDocument().getLength());	
 			this.doStop = true;
@@ -134,7 +140,12 @@ public class ArduinoCliRunnable implements Runnable {
 		exitStatus = OpenblocksFrame.runCommandLine(build_install_servolib_cmd());
 		
 		if (exitStatus != 0) {
-			textArea.append("Error installing servo library.  Make sure that your computer is connected to the internet and try again!\n");
+			if (exitStatus == -2) {
+				textArea.append("Check to make sure that the arduino-cli folder exists!\n");	
+			}
+			else {
+				textArea.append("Error installing servo library.  Make sure that your computer is connected to the internet and try again!\n");
+			}
 			textArea.setBackground(Color.red);
 			textArea.setCaretPosition(textArea.getDocument().getLength());	
 			this.doStop = true;
