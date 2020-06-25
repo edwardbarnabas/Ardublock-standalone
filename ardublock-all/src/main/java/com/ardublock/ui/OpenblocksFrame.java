@@ -175,6 +175,8 @@ public class OpenblocksFrame extends JFrame
 		BufferedReader input;
 		String line;
 		int ret;
+		boolean firstTimeA = true;
+		boolean firstTimeB = true;
 		
 		uploadTextArea.append("Sending command:");
 		for (String str : strArray) {
@@ -186,7 +188,31 @@ public class OpenblocksFrame extends JFrame
 			input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			while ((line = input.readLine()) != null) {
 					System.out.println(line);
-					uploadTextArea.append(line + "\n");
+					
+					if (line.contains("installer:PHASE:Registering")) {
+						
+						if (firstTimeA) {
+							uploadTextArea.append("\n" + line);
+							firstTimeA = false;
+						}
+						else {
+							uploadTextArea.append(".");
+						}
+						
+					}
+					else if (line.contains("installer:PHASE:Updating preboot")) {
+						if (firstTimeB) {
+							uploadTextArea.append("\n" + line);
+							firstTimeB = false;
+						}
+						else {
+							uploadTextArea.append(".");
+						}
+					}
+					else {
+						uploadTextArea.append("\n" + line);
+					}
+					
 					//- go to last line of the textArea
 					uploadTextArea.setCaretPosition(uploadTextArea.getDocument().getLength());
 			}
