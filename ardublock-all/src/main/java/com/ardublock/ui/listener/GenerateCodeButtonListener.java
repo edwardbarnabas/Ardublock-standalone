@@ -90,18 +90,6 @@ public class GenerateCodeButtonListener implements ActionListener
 		compileRunnable = new CompileRunnable(parentFrame,this);
 		compileThread = new Thread(compileRunnable);
 		
-		//-create temp_sketch directory in the executing folder of this .jar
-		sketchfileDir = context.getSketchDir();
-		
-		File directory = new File(sketchfileDir);
-		if(!directory.exists()) {
-			System.out.println("Creating directory: " + sketchfileDir);
-			directory.mkdir();
-		}
-		
-		//- create file path to the .ino that will be created later.
-		//- add quotes around file path in case there are whitespaces in the path
-		sketchfilePath = sketchfileDir + context.getSketchName();
 
 	}
 
@@ -323,6 +311,25 @@ public class GenerateCodeButtonListener implements ActionListener
 		
 		textArea.setBackground(Color.white);
 		textArea.setText("");
+		
+		//-create temp_sketch directory in the executing folder of this .jar
+		sketchfileDir = context.getSketchDir();
+		
+		textArea.append("Checking for sketch directory...");
+		
+		File directory = new File(sketchfileDir);
+		if(!directory.exists()) {
+			textArea.append("Creating directory: " + sketchfileDir);
+			System.out.println("Creating directory: " + sketchfileDir);
+			directory.mkdir();
+		}
+		
+		textArea.append("...Done\n");
+		
+		//- create file path to the .ino that will be created later.
+		//- add quotes around file path in case there are whitespaces in the path
+		sketchfilePath = sketchfileDir + context.getSketchName();
+		
 		textArea.append("Generating Blocks...");
 		
 		if(generateC()) {

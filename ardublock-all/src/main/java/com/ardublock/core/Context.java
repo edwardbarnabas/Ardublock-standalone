@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -262,8 +263,10 @@ public class Context
 		String path = System.getProperty("user.dir");
 
 		if (osType.equals(OsType.WINDOWS)) {
-			path += "\\app\\BarnabasArdublockTools";
-			path += "\\temp_sketch";
+			//path += "\\app\\BarnabasArdublockTools";
+			//- put sketch in temp directory so that you don't need admin priviledges to write to it
+			path = System.getProperty("java.io.tmpdir");
+			path += "temp_sketch";
 		}
 		else if (osType.equals(OsType.MAC)) {
 			//- access home folder for mac to access files
