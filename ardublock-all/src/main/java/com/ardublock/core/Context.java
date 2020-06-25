@@ -109,6 +109,7 @@ public class Context
 		String path = null;
 
 		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\app\\BarnabasArdublockTools";
 			path = "\\temp_sketch.ino";
 		}
 		else if (osType.equals(OsType.MAC)) {

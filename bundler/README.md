@@ -10,4 +10,4 @@ For Windows –
 
 The command below creates installer that will install software into Program Files folder along with dependencies
 
-jpackage --input target/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type exe --java-options '--enable-preview' --icon "barnabas_logo.ico"
+jpackage --input target/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type exe --java-options '--enable-preview' --icon "barnabas_logo.ico" --win-shortcut
