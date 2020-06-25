@@ -132,6 +132,7 @@ public class Context
 			path += "\\CH341\\CH341SER_win";
 		}
 		else if (osType.equals(OsType.MAC)) {
+			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
 			path += "/CH341/CH341SER_mac";
 		}
 		else if (osType.equals(OsType.LINUX)) {
@@ -240,6 +241,8 @@ public class Context
 			path += "\\arduino_cli\\win_64\\arduino-cli.exe";
 		}
 		else if (osType.equals(OsType.MAC)) {
+			//- access home folder for mac to access files
+			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
 			path += "/arduino_cli/mac/arduino-cli";
 		}
 		else if (osType.equals(OsType.LINUX)) {
@@ -261,6 +264,8 @@ public class Context
 			path += "\\temp_sketch";
 		}
 		else if (osType.equals(OsType.MAC)) {
+			//- access home folder for mac to access files
+			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
 			path += "/temp_sketch";
 		}
 		else if (osType.equals(OsType.LINUX)) {
