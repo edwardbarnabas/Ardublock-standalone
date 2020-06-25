@@ -120,7 +120,6 @@ public class Context
 		else {
 			path = "/temp_sketch.ino";
 		}
-	
 		return path;
 	}
 	
@@ -129,6 +128,7 @@ public class Context
 		String path = System.getProperty("user.dir");
 
 		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\app\\BarnabasArdublockTools";
 			path += "\\CH341\\CH341SER_win";
 		}
 		else if (osType.equals(OsType.MAC)) {
@@ -238,6 +238,7 @@ public class Context
 		String path = System.getProperty("user.dir");
 
 		if (osType.equals(OsType.WINDOWS)) {
+			path += "\\app\\BarnabasArdublockTools";
 			path += "\\arduino_cli\\win_64\\arduino-cli.exe";
 		}
 		else if (osType.equals(OsType.MAC)) {
