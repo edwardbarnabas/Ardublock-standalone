@@ -156,10 +156,12 @@ public class Context
 		String path = getCH341Dir();
 		
 		if (osType.equals(OsType.WINDOWS)) {
+			
 			cmd_list.add(path + "\\ch341_install_win.bat");
 		}
 		else if (osType.equals(OsType.MAC)) {
-			cmd_list.add(path + "\\ch341_install_mac.sh");
+			cmd_list.add("bash");
+			cmd_list.add(path + "/ch341_install_mac.sh");
 		}
 		else if (osType.equals(OsType.LINUX)) {
 			//- do nothing
@@ -174,7 +176,60 @@ public class Context
 		return cmd_array;
 	}
 	
+	public String[] build_board_index_cli_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+		cmd_list.add(getArduinoCliDir());
+		cmd_list.add("core");
+		cmd_list.add("update-index");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
 	
+	public String[] build_core_arduino_boards_cli_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+		cmd_list.add(getArduinoCliDir());
+		cmd_list.add("core");
+		cmd_list.add("install");
+		cmd_list.add("arduino:avr");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
+	
+	public String[] build_install_servolib_cmd() {
+		
+		ArrayList<String> cmd_list = new ArrayList<String>();
+		String[] cmd_array;
+		
+		cmd_list.clear();
+
+		/*if (osType.equals(OsType.MAC) || osType.equals(OsType.LINUX)) {
+			cmd_list.add("sudo");
+		}
+		*/
+		cmd_list.add(getArduinoCliDir());
+		cmd_list.add("lib");
+		cmd_list.add("install");
+		cmd_list.add("servo");
+		
+		cmd_array = new String[cmd_list.size()];
+		cmd_array = cmd_list.toArray(cmd_array);
+		
+		return cmd_array;
+	}
 
 
 	public String getArduinoCliDir() {
