@@ -2,14 +2,14 @@
 cd ardublock-all
 
 : Create clean maven package
-call mvn clean
-call mvn package
+mvn clean
+mvn package
 
 : CD back to ardublock-standalone directory
-cd..
+cd ..
 
 : Move new ardubock.jar file to the bundler
-mv /y $(dirname "$0")/ardublock-all/target/ardublock-all.jar $(dirname "$0")/bundler/target_mac
+mv -f $PWD/ardublock-all/target/ardublock-all.jar $PWD/bundler/target_mac
 
 : CD to bundler directory
 cd bundler
@@ -17,5 +17,3 @@ cd bundler
 : Build package
 jpackage --input target_mac/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type pkg --java-options '--enable-preview' --icon "barnabas_logo.icns"
 
-: Pause to allow user to see terminal feedback
-pause
