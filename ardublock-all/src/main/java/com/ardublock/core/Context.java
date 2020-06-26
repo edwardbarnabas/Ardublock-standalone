@@ -133,7 +133,8 @@ public class Context
 			path += "\\CH341\\CH341SER_win";
 		}
 		else if (osType.equals(OsType.MAC)) {
-			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
+			//path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
+			path = "/Applications/BarnabasArdublock.app/Contents/app/BarnabasArdublockTools";
 			path += "/CH341/CH341SER_mac";
 		}
 		else if (osType.equals(OsType.LINUX)) {
@@ -244,7 +245,8 @@ public class Context
 		}
 		else if (osType.equals(OsType.MAC)) {
 			//- access home folder for mac to access files
-			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
+			//path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
+			path = "/Applications/BarnabasArdublock.app/Contents/app/BarnabasArdublockTools";
 			path += "/arduino_cli/mac/arduino-cli";
 		}
 		else if (osType.equals(OsType.LINUX)) {
@@ -260,17 +262,14 @@ public class Context
 
 	public String getSketchDir() {
 
-		String path = System.getProperty("user.dir");
+		//- put sketch in temp directory so that you don't need admin priviledges to write to it
+		String path = System.getProperty("java.io.tmpdir");
 
 		if (osType.equals(OsType.WINDOWS)) {
 			//path += "\\app\\BarnabasArdublockTools";
-			//- put sketch in temp directory so that you don't need admin priviledges to write to it
-			path = System.getProperty("java.io.tmpdir");
 			path += "temp_sketch";
 		}
 		else if (osType.equals(OsType.MAC)) {
-			//- access home folder for mac to access files
-			path = System.getProperty("user.home") + "/Applications/BarnabasArdublockTools";
 			path += "/temp_sketch";
 		}
 		else if (osType.equals(OsType.LINUX)) {

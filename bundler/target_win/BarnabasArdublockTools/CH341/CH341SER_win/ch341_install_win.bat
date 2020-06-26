@@ -1,0 +1,1 @@
+start /w setup.exe /s

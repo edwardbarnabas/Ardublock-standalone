@@ -4,10 +4,12 @@
 
 For Mac---
 
-jpackage --input target/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type dmg --java-options '--enable-preview' --icon "barnabas_logo.icns"
+FOR PKG:
+jpackage --input target_mac/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type pkg --java-options '--enable-preview' --icon "barnabas_logo.icns"
+
 
 For Windows – 
 
 The command below creates installer that will install software into Program Files folder along with dependencies
 
-jpackage --input target/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type exe --java-options '--enable-preview' --icon "barnabas_logo.ico" --win-shortcut
+jpackage --input target_win/ --name BarnabasArdublock --main-jar ardublock-all.jar --main-class com.ardublock.Main --type exe --java-options '--enable-preview' --icon "barnabas_logo.ico" --win-shortcut
