@@ -13,6 +13,9 @@ public class SerialUploadRunnable implements Runnable {
 	private JTextArea textArea;
 	private OpenblocksFrame parentFrame;
 	public boolean timed_out = false;
+	
+	//- timeout of 15 sec 
+	private long timeOut = 15000;
 
 	public SerialUploadRunnable(OpenblocksFrame oframe) {
 		parentFrame = oframe;
@@ -65,6 +68,8 @@ public class SerialUploadRunnable implements Runnable {
 		for (String str : upload_cmd_array) {
 			textArea.append(str + " ");
 		}
+		
+		textArea.append("\nStarting to upload. Please wait.  We'll give it up to " + (timeOut/1000) + " seconds...");
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
 
 		//- setup process
@@ -77,8 +82,8 @@ public class SerialUploadRunnable implements Runnable {
 		System.out.println("Testing for timeout...");
 		
 		try {
-			//- 8 second timeout for uploading
-		    worker.join(8000);
+			
+		    worker.join(timeOut);
 		    
 		    if (worker.exit != null) {
 		    	int workerStatus = worker.exit;
@@ -169,7 +174,7 @@ public class SerialUploadRunnable implements Runnable {
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
 		
 	}
-
+/*
 	private void runUploadProcess_arduino_debug() throws InterruptedException, IOException, RuntimeException {
 		
 		//- Initialize variables
@@ -236,21 +241,21 @@ public class SerialUploadRunnable implements Runnable {
 				
 				textArea.append("\n");
 
-				textArea.append("\nStarting to upload. Please wait...");
-				
-				//- go to last line of the textArea
-				textArea.setCaretPosition(textArea.getDocument().getLength());	
+			
 
 				//- execution gets to this code once compiling finishes and it begins to upload
 				//- we have timeout functionality here to exit gracefully if it gets stuck here.
 				Worker worker = new Worker(process);
 				worker.start();
-				System.out.println("Testing for timeout...");
 				
 				try {
 					//- 8 second timeout for uploading
 				    worker.join(8000);
 				    
+				    System.out.println("Testing for timeout.");
+
+					textArea.setCaretPosition(textArea.getDocument().getLength());	
+				    				    
 				    if (worker.exit != null) {
 				    	int workerStatus = worker.exit;
 				    	System.out.println("Success: Process completed without time out." + "Status Code: " + workerStatus);
@@ -352,6 +357,6 @@ public class SerialUploadRunnable implements Runnable {
 		textArea.setCaretPosition(textArea.getDocument().getLength());	
 		
 	}
-	
+*/	
 
 }
