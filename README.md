@@ -6,7 +6,8 @@ This project is a branch from the original Ardublock project (link below) from @
 
 General Software Architecture:
 - Uses JSerialComm library to access comm ports for detection and serial monitor
-- Uses Arduino command line tools to compile and upload code (Windows: arduino_debug.exe, Mac: /Applications/Arduino.app/Contents/MacOS/Arduino Linx: TBD)
+- Uses arduino-cli to compile and upload
+- Uses open blocks to generate and translate blocks into C code
 
 Notes on compiling:
 - Linux: https://hackaday.io/project/166167-barnabas-robotics-ardublock-upgrade
