@@ -4,6 +4,9 @@
 
 This project is a branch from the original Ardublock project (link below) from @taweili.  We plan to use this with our robotics students, but it can be adapted to any Arduino-based platform.  Arduino must be install on a system for it it t work.  
 
+Usage:
+- Installers for mac/windows can be found in the "bundler" folder.
+
 General Software Architecture:
 - Uses JSerialComm library to access comm ports for detection and serial monitor
 - Uses arduino-cli to compile and upload
