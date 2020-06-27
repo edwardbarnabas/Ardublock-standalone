@@ -13,24 +13,17 @@ General Software Architecture:
 - Uses open blocks to generate and translate blocks into C code
 
 Blocks, Project Selection and XML:
-The blocks generated and shown are set by the .xml file in: 
-
-ardublock-all/src/main/resources/com/ardublock/block/
-
-Right now, there are two different sets of blocks based on the project selected.  
-
-Barnabas-Bot -> ardublock_barnabas_bot.xml
-Barnabas-Racer -> ardublock_barnabas_racer.xml
-
-To add more blocks, I recommend creating a new .xml file and add it is an option that is selected when users select the "Project".  
-
-ardublock.xml is the original xml file that can be referenced when making your own .xml.
+- The blocks generated and shown are set by the .xml file in: ardublock-all/src/main/resources/com/ardublock/block/
+- Right now, there are two different sets of blocks based on the project selected.  
+-- Barnabas-Bot -> ardublock_barnabas_bot.xml
+-- Barnabas-Racer -> ardublock_barnabas_racer.xml
+- To add more blocks, I recommend creating a new .xml file and add it is an option that is selected when users select the "Project".  ardublock.xml is the original xml file that can be referenced when making your own .xml.
 
 Creating New Blocks:
-To create new blocks, you need to modify three things.
-1) ardublock_<project>.xml - controls what the blocks look like, and what is shown in the GUI.  Found in: ardublock-all/src/main/resources/com/ardublock/block/
-2) <block>.java - class that you create to translate block into C code.  Placed in: ardublock-all/src/main/java/com/ardublock/translator/block/
-3) block-mapping.properties - connects the xml and .java file. Found in: ardublock-all/src/main/resources/com/ardublock/block/
+- To create new blocks, you need to modify three things.
+-- ardublock_<project>.xml - controls what the blocks look like, and what is shown in the GUI.  Found in: ardublock-all/src/main/resources/com/ardublock/block/
+-- <block>.java - class that you create to translate block into C code.  Placed in: ardublock-all/src/main/java/com/ardublock/translator/block/
+-- block-mapping.properties - connects the xml and .java file. Found in: ardublock-all/src/main/resources/com/ardublock/block/
 
 Compiling:
 - Linux: https://hackaday.io/project/166167-barnabas-robotics-ardublock-upgrade
