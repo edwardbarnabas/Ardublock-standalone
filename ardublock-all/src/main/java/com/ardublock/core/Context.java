@@ -412,21 +412,23 @@ public class Context
 	private void loadDefaultArdublockProgram()
 	{
 		
-		//Workspace workspace = workspaceController.getWorkspace();
-		
 		workspace = workspaceController.getWorkspace();
 		Page page = workspace.getPageNamed("Ardublock Workspace");
 		
-		FactoryManager manager = workspace.getFactoryManager();
+		//- add empty loop block
+		//- removed default loop do block
+	/*	FactoryManager manager = workspace.getFactoryManager();
 		Block newBlock;
 		
-		//- add empty loop block
         newBlock = new Block(workspace, "loop", false);
         FactoryRenderableBlock factoryRenderableBlock = new FactoryRenderableBlock(workspace, manager, newBlock.getBlockID());
+        
         RenderableBlock renderableBlock = factoryRenderableBlock.createNewInstance();
         renderableBlock.setLocation(100, 100);
-
+        
         page.addBlock(renderableBlock);
+        
+        */
         
 	}
 	
