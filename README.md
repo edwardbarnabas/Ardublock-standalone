@@ -20,9 +20,6 @@ Creating .EXE and .PKG:
 Resources:
 - JSerial & Maven: http://www.mschoeffler.de/2017/12/29/tutorial-serial-connection-between-java-application-and-arduino-uno/
 
-Usage:
-- Arduino IDE needs to be installed but not running in order for the code to work since it runs using arduino_debug.exe
-
 Notes:
 - 20200626: Added support of arduino-cli and made compatible with windwos and mac installer
 - 20200619: Linux path added to support linux.  Updated GUI.  Allow user to select Barnabas project to dynamically change available blocks shown.
