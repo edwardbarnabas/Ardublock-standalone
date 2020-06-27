@@ -12,6 +12,10 @@ Notes on compiling:
 - Linux: https://hackaday.io/project/166167-barnabas-robotics-ardublock-upgrade
 - Windows: https://docs.google.com/document/d/1PI4S1P38JGV4XWac7j-tIMILE7Mu8z1q6YpewNNaw1A/edit
 
+Creating .EXE and .PKG:
+- Run build_exe.bat on a Windows machine to create Windows installer
+- Run build_pkg.sh on a Mac machine to create a Mac installer.
+
 Resources:
 - JSerial & Maven: http://www.mschoeffler.de/2017/12/29/tutorial-serial-connection-between-java-application-and-arduino-uno/
 
@@ -19,6 +23,7 @@ Usage:
 - Arduino IDE needs to be installed but not running in order for the code to work since it runs using arduino_debug.exe
 
 Notes:
+- 20200626: Added support of arduino-cli and made compatible with windwos and mac installer
 - 20200619: Linux path added to support linux.  Updated GUI.  Allow user to select Barnabas project to dynamically change available blocks shown.
 - 20200614: Now works with Mac
 - 20200610: Only tested on 64-bit Windows.

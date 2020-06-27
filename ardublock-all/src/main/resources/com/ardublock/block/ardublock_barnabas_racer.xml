@@ -83,12 +83,6 @@
 				</BlockConnector>
 			</BlockConnectors>
 			
-			<Images>
-				<Image>
-					<FileLocation>com/ardublock/block/barnabasrobotic/ardublockIcon_delay_ms.png</FileLocation>
-				</Image>
-			</Images>
-			
 		</BlockGenus>
 		<BlockGenus name="if" kind="command" initlabel="bg.if" color="255 221 0">
 			<description>
@@ -299,7 +293,7 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="6" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.frequency">
 					<DefaultArg genus-name="number" label="440" />
@@ -339,7 +333,7 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="6" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 			</BlockConnectors>
 			<Images>
@@ -356,7 +350,7 @@
             </description>
             <BlockConnectors>
                 <BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-                    <DefaultArg genus-name="number" label="6" />
+                    <DefaultArg genus-name="number" label="1" />
                 </BlockConnector>
                 <BlockConnector connector-type="boolean" connector-kind="socket" label="bc.status">
                     <DefaultArg genus-name="button-pressed" label="PRESSED" />
@@ -1347,10 +1341,10 @@
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="plug" label="cm" />
 				<BlockConnector connector-type="number" connector-kind="socket" label="trigger #">
-					<DefaultArg genus-name="number" label="3" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="number" connector-kind="socket" label="echo #">
-					<DefaultArg genus-name="number" label="4" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 			</BlockConnectors>
 			<Images>
@@ -1656,10 +1650,10 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="9" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.angle">
-					<DefaultArg genus-name="number" label="1" />
+					<DefaultArg genus-name="number" label="0" />
 				</BlockConnector>
 			</BlockConnectors>
 			<Images>
@@ -1675,7 +1669,7 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="7" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="boolean" connector-kind="socket" label="bc.status">
 					<DefaultArg genus-name="digital-on" label="ON" />
@@ -1789,14 +1783,78 @@
 				<BlockGenusMember>while</BlockGenusMember>
 				<BlockGenusMember>do_while</BlockGenusMember>
 				
-				<BlockGenusMember>repeat</BlockGenusMember>
-				<BlockGenusMember>repeat_control</BlockGenusMember>
 				<BlockGenusMember>break</BlockGenusMember>
 			 	<BlockGenusMember>subroutine</BlockGenusMember>
 				<BlockGenusMember>subroutine-ref</BlockGenusMember> 
 				
 			</BlockDrawer>
 			
+			<BlockDrawer button-color="255 163 82" name="bd.logic" type="factory">
+				<BlockGenusMember>greater</BlockGenusMember>
+				<BlockGenusMember>less</BlockGenusMember>
+				<BlockGenusMember>equal</BlockGenusMember>
+				<BlockGenusMember>greater_equal</BlockGenusMember>
+				<BlockGenusMember>less_equal</BlockGenusMember>
+				<BlockGenusMember>not_equal</BlockGenusMember>
+				<BlockGenusMember>equal_digital</BlockGenusMember>
+				<BlockGenusMember>not_equal_digital</BlockGenusMember>
+				<BlockGenusMember>equal_poly</BlockGenusMember>
+				<BlockGenusMember>not_equal_poly</BlockGenusMember>
+				<BlockGenusMember>equal_string</BlockGenusMember>
+				<BlockGenusMember>not_equal_string</BlockGenusMember>
+				<BlockGenusMember>and</BlockGenusMember>
+				<BlockGenusMember>or</BlockGenusMember>
+				<BlockGenusMember>not</BlockGenusMember>
+				<BlockGenusMember>string_equal</BlockGenusMember>
+				<BlockGenusMember>string_empty</BlockGenusMember>
+				<BlockGenusMember>string_toInt</BlockGenusMember>
+			</BlockDrawer>
+			
+			<BlockDrawer button-color="114 147 71" name="bd.operators" type="factory">
+				<BlockGenusMember>addition</BlockGenusMember>
+				<BlockGenusMember>subtraction</BlockGenusMember>
+				<BlockGenusMember>multiplication</BlockGenusMember>
+				<BlockGenusMember>division</BlockGenusMember>
+				<BlockGenusMember>modulo</BlockGenusMember>
+				<BlockGenusMember>abs</BlockGenusMember>
+				<BlockGenusMember>pow</BlockGenusMember>
+				<BlockGenusMember>sqrt</BlockGenusMember>
+				<BlockGenusMember>sin</BlockGenusMember>
+				<BlockGenusMember>cos</BlockGenusMember>
+				<BlockGenusMember>tan</BlockGenusMember>
+				<BlockGenusMember>random_range</BlockGenusMember>
+				<BlockGenusMember>map</BlockGenusMember>
+			</BlockDrawer>
+			
+			<BlockDrawer button-color="232 156 149" name="bd.number" type="factory">
+				<BlockGenusMember>number</BlockGenusMember>
+				<BlockGenusMember>setter_variable_number</BlockGenusMember>
+				<BlockGenusMember>variable_number</BlockGenusMember>
+				<BlockGenusMember>millis</BlockGenusMember>				
+				<BlockGenusMember>setter_variable_digital</BlockGenusMember>
+				<BlockGenusMember>variable_digital</BlockGenusMember>
+				<BlockGenusMember>digital-low</BlockGenusMember>
+				<BlockGenusMember>digital-high</BlockGenusMember>
+				<BlockGenusMember>true</BlockGenusMember>
+				<BlockGenusMember>false</BlockGenusMember>
+				<BlockGenusMember>setter_variable_number_double</BlockGenusMember>
+				<BlockGenusMember>variable_number_double</BlockGenusMember>
+				<BlockGenusMember>number_double</BlockGenusMember>
+				<BlockGenusMember>setter_variable_char</BlockGenusMember>
+				<BlockGenusMember>char</BlockGenusMember>
+				<BlockGenusMember>variable_string</BlockGenusMember>
+				<BlockGenusMember>setter_variable_String</BlockGenusMember>
+				<BlockGenusMember>variable_String</BlockGenusMember>
+				<BlockGenusMember>message</BlockGenusMember>
+			</BlockDrawer>
+			
+			<BlockDrawer button-color="255 255 255" name="bd.communication" type="factory">
+				<BlockGenusMember>serial_println</BlockGenusMember>
+				<BlockGenusMember>glue_sn</BlockGenusMember>
+				<BlockGenusMember>glue_sb</BlockGenusMember>
+			</BlockDrawer>
+			
+
 			<BlockDrawer button-color="0 200 0" name="bd.lights" type="factory">
 			    <BlockGenusMember>br_led</BlockGenusMember>
 			</BlockDrawer> 
@@ -1814,6 +1872,8 @@
 				<BlockGenusMember>button</BlockGenusMember>
 				<BlockGenusMember>ultrasonic</BlockGenusMember>
 			</BlockDrawer>
+			
+			
       
 			
 		</BlockDrawerSet>

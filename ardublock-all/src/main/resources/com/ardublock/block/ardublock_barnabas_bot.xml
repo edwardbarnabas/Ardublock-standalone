@@ -83,11 +83,6 @@
 				</BlockConnector>
 			</BlockConnectors>
 			
-			<Images>
-				<Image>
-					<FileLocation>com/ardublock/block/barnabasrobotic/ardublockIcon_delay_ms.png</FileLocation>
-				</Image>
-			</Images>
 			
 		</BlockGenus>
 		<BlockGenus name="if" kind="command" initlabel="bg.if" color="255 221 0">
@@ -299,7 +294,7 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="6" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.frequency">
 					<DefaultArg genus-name="number" label="440" />
@@ -332,14 +327,14 @@
 			</BlockConnectors>
 		</BlockGenus>
 
-		<BlockGenus name="no_tone" kind="command" color="255 102 0" initlabel="noTone">
+		<BlockGenus name="no_tone" kind="command" color="255 102 0" initlabel="">
 			<description>
 				<text>Stops the generation of a square wave triggered by tone().
 				</text>
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="6" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 			</BlockConnectors>
 			<Images>
@@ -1656,10 +1651,10 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="9" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.angle">
-					<DefaultArg genus-name="number" label="1" />
+					<DefaultArg genus-name="number" label="0" />
 				</BlockConnector>
 			</BlockConnectors>
 			<Images>
@@ -1675,7 +1670,7 @@
 			</description>
 			<BlockConnectors>
 				<BlockConnector connector-type="number" connector-kind="socket" label="bc.pin_number">
-					<DefaultArg genus-name="number" label="7" />
+					<DefaultArg genus-name="number" label="1" />
 				</BlockConnector>
 				<BlockConnector connector-type="boolean" connector-kind="socket" label="bc.status">
 					<DefaultArg genus-name="digital-on" label="ON" />
