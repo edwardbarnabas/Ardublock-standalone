@@ -24,7 +24,7 @@ Resources:
 - JSerial & Maven: http://www.mschoeffler.de/2017/12/29/tutorial-serial-connection-between-java-application-and-arduino-uno/
 
 Notes:
-- 20200626: Added support of arduino-cli and made compatible with windwos and mac installer
+- 20200626: Added support of arduino-cli and created scripts for mac and windows installer generation.
 - 20200619: Linux path added to support linux.  Updated GUI.  Allow user to select Barnabas project to dynamically change available blocks shown.
 - 20200614: Now works with Mac
 - 20200610: Only tested on 64-bit Windows.
