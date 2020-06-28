@@ -1,3 +1,6 @@
+barnabas.exe -> executable renamed for download by users
+barnabas.pkg -> package renamed for download by users
+
 1) Make sure to install JDK 14
 2) add java to JAVA_HOME environment variable
 3) add JAVA_HOME to path
