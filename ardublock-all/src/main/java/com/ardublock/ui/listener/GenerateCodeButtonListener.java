@@ -78,6 +78,9 @@ public class GenerateCodeButtonListener implements ActionListener
 		this.context = context;
 		this.textArea = oframe.uploadTextArea;
 		
+		
+		
+		
 		workspace = context.getWorkspaceController().getWorkspace();
 		uiMessageBundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");
 		
@@ -89,6 +92,7 @@ public class GenerateCodeButtonListener implements ActionListener
 		uploadThread = new Thread(uploadRunnable);
 		compileRunnable = new CompileRunnable(parentFrame,this);
 		compileThread = new Thread(compileRunnable);
+		
 		
 
 	}
@@ -291,6 +295,9 @@ public class GenerateCodeButtonListener implements ActionListener
 	
 	public void actionPerformed(ActionEvent e)
 	{
+		
+		//- first stop the serial monitor so that it doesn't affect the upload
+		parentFrame.serialMonitorframe.dispatchEvent(new WindowEvent(parentFrame.serialMonitorframe, WindowEvent.WINDOW_CLOSING));
 		
 		//- upload button has been set.  Set upload/compile settings based on port and board.
 		selectedBoard = (String) parentFrame.boardOptionsComboBox.getSelectedItem();

@@ -41,8 +41,7 @@ public class SerialUploadRunnable implements Runnable {
 		/* loop here forever once the thread begins.  Execute the upload process by toggling the doStop flag */
 		while (true) {
 			if (keepRunning()) {
-				try {
-					//runUploadProcess_arduino_debug();
+				try {	
 					runUploadProcess_arduino_cli();
 				} catch (InterruptedException | IOException | RuntimeException e ) {
 					// TODO Auto-generated catch block

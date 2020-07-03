@@ -29,9 +29,7 @@ public class TranslatorBlockFactory
 		shortClassName.put("tone", "com.ardublock.translator.block.ToneBlock");
 		shortClassName.put("toneTime", "com.ardublock.translator.block.ToneTimeBlock");
 		shortClassName.put("noTone", "com.ardublock.translator.block.NoToneBlock");
-		//new
 		shortClassName.put("newButton", "com.ardublock.translator.block.ButtonBlock");
-		//
 	}
 
 

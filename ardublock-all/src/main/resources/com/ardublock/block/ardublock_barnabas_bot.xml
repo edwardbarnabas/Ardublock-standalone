@@ -82,9 +82,20 @@
 					<DefaultArg genus-name="number" label="1000" />
 				</BlockConnector>
 			</BlockConnectors>
-			
-			
 		</BlockGenus>
+		
+		<BlockGenus name="wait" kind="command" color="255 221 0" initlabel="bg.wait">
+			<description>
+				<text>program wait in x seconds</text>
+			</description>
+			<BlockConnectors>
+				<BlockConnector connector-type="number" connector-kind="socket" label="bc.wait">
+					<DefaultArg genus-name="number_double" label="1" />
+				</BlockConnector>
+			</BlockConnectors>
+		</BlockGenus>
+		
+		
 		<BlockGenus name="if" kind="command" initlabel="bg.if" color="255 221 0">
 			<description>
 				<text>
@@ -1775,6 +1786,7 @@
 			<BlockDrawer name="bd.control" type="factory" is-open="yes" button-color="255 255 0">
         <BlockGenusMember>loop</BlockGenusMember>
 				<BlockGenusMember>delay</BlockGenusMember>
+				<BlockGenusMember>wait</BlockGenusMember>
 				<BlockGenusMember>repeat_times</BlockGenusMember>
 				
 				<!--

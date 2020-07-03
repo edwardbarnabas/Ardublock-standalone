@@ -86,7 +86,7 @@ public class OpenblocksFrame extends JFrame
 	public JScrollPane serialMonitorScrollPane;
 	public SerialMonitor monitor;
 	public JTextArea serialMonitortextArea; 
-	private SerialMonitorRunnable sm_Runnable;
+	public SerialMonitorRunnable sm_Runnable;
 	private Thread serialMonitorThread;
 	
 	//- Serial Port Detection
