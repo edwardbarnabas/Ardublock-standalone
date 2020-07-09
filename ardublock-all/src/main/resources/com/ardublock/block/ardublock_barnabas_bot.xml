@@ -1785,11 +1785,12 @@
 			
 			<BlockDrawer name="bd.control" type="factory" is-open="yes" button-color="255 255 0">
         <BlockGenusMember>loop</BlockGenusMember>
-				<BlockGenusMember>delay</BlockGenusMember>
+				
 				<BlockGenusMember>wait</BlockGenusMember>
 				<BlockGenusMember>repeat_times</BlockGenusMember>
 				
 				<!--
+				<BlockGenusMember>delay</BlockGenusMember>
 				<BlockGenusMember>delay_microseconds</BlockGenusMember>
 				
 				<BlockGenusMember>program</BlockGenusMember>
