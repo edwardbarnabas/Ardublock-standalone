@@ -138,6 +138,7 @@ public class Context
 			path += "/CH341/CH341SER_mac";
 		}
 		else if (osType.equals(OsType.LINUX)) {
+		    path += "/app/BarnabasArdublockTools";
 			path += "/CH341/CH341SER_linux";
 		}
 		else {
@@ -168,6 +169,7 @@ public class Context
 		}
 		else if (osType.equals(OsType.LINUX)) {
 			//- do nothing
+			
 		}
 		else {
 			//- do nothing
@@ -250,10 +252,10 @@ public class Context
 			path += "/arduino_cli/mac/arduino-cli";
 		}
 		else if (osType.equals(OsType.LINUX)) {
-			path += "/arduino_cli/linux_64/arduino-cli";
+			path += "/app/BarnabasArdublockTools/arduino_cli/linux_64/arduino-cli";
 		}
 		else {
-			path += "/arduino_cli/linux_64";
+			path += "/arduino_cli/linux_64/arduino-cli";
 		}
 	
 		return path;
